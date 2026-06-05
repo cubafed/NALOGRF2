@@ -16,6 +16,7 @@ import { ReportQuestionsSection } from "./ReportQuestionsSection";
 import { ReportDisclaimer } from "./ReportDisclaimer";
 import { ReportEmptyState } from "./ReportEmptyState";
 import { ReportPrintActions } from "./ReportPrintActions";
+import { SaveReportPanel } from "@/components/persistence/SaveReportPanel";
 
 export function ReportPreview() {
   const [session, setSession] = useState<ImportSession | null | "loading">("loading");
@@ -57,6 +58,7 @@ export function ReportPreview() {
       </div>
 
       <ReportPrintActions report={model} />
+      <SaveReportPanel session={session} report={model} />
 
       <div className="print-report-root">
         <ReportHeader fileName={model.fileName} savedAt={model.savedAt} />

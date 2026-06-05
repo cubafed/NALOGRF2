@@ -18,6 +18,8 @@ export function Header() {
           <Link href="/problems">Проблемы</Link>
           <Link href="/report">Отчет</Link>
           <Link href="/partners">Партнерам</Link>
+          <Link href="/saved-reports">Сохраненные</Link>
+          <Link href="/account">Аккаунт</Link>
         </nav>
         <Link href="/upload" className="btn btn-primary">
           Загрузить CSV
