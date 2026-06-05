@@ -15,6 +15,7 @@ export function Header() {
           <Link href="/">Главная</Link>
           <Link href="/demo">Демо-отчет</Link>
           <Link href="/upload">Загрузить CSV</Link>
+          <Link href="/problems">Проблемы</Link>
           <span className="nav-placeholder" aria-disabled="true">
             Для партнеров
           </span>
