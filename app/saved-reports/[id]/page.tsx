@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { FooterDisclaimer } from "@/components/layout/FooterDisclaimer";
 import { SavedReportDetail } from "@/components/persistence/SavedReportDetail";
+import { ReportFileUploadPanel } from "@/components/storage/ReportFileUploadPanel";
 import { SupabaseUnavailableNotice } from "@/components/persistence/SupabaseUnavailableNotice";
 import { createSupabaseSavedReportService } from "@/lib/persistence/saved-report-service.supabase";
 import type { SavedReportRecord } from "@/lib/persistence/saved-report-types";
@@ -112,7 +113,12 @@ export default function SavedReportDetailPage() {
                 </div>
               </section>
             )}
-            {state.status === "ready" && <SavedReportDetail report={state.report} />}
+            {state.status === "ready" && (
+              <>
+                <SavedReportDetail report={state.report} />
+                <ReportFileUploadPanel savedReportId={state.report.id} />
+              </>
+            )}
           </div>
         </section>
       </main>

@@ -65,7 +65,8 @@ Primary message:
 - `/saved-reports` — optional saved reports list. Shows unavailable/sign-in states
   without Supabase/auth, and lists authenticated Supabase `saved_reports` rows when
   available.
-- `/saved-reports/[id]` — saved report metadata/detail view from the persisted row.
+- `/saved-reports/[id]` — saved report metadata/detail view from the persisted row
+  with explicit PDF attachment upload when Supabase Storage is configured.
 
 ## Local Partner Attribution
 
@@ -88,8 +89,9 @@ When configured, `/account` exposes email magic-link sign-in and sign-out.
 authenticated user. `/saved-reports` lists saved report metadata and links to
 `/saved-reports/[id]`.
 
-Raw CSV files are not uploaded automatically, storage upload is not implemented,
-and no service role keys are used in browser code.
+On `/saved-reports/[id]`, authenticated users can explicitly attach a PDF report
+file to a saved report. Raw CSV files are not uploaded automatically or manually
+in this PR, and no service role keys are used in browser code.
 
 Database schema and storage notes live in `supabase/`.
 
@@ -110,9 +112,12 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 7. Click `Сохранить отчет`.
 8. Open `/saved-reports` and confirm the saved report appears.
 9. Open the saved report detail page.
+10. Select a PDF file and click `Загрузить PDF`.
+11. Confirm the attached file metadata appears on the detail page.
 
-PR10 does not implement storage upload, payment, tax filing, exchange APIs,
-external analytics, or server-side PDF generation.
+Storage upload is explicit and PDF-only. Payment, tax filing, exchange APIs,
+external analytics, raw CSV upload, automatic upload, and server-side PDF
+generation are not implemented.
 
 ## Setup
 
@@ -134,6 +139,6 @@ The production build does not require environment variables.
 
 ## Next Planned PRs
 
-1. Add explicit file upload-to-storage action for authenticated users.
+1. Add signed download links for attached report files.
 2. Add saved report delete/archive UI.
-3. Add saved report detail polish without changing parser/risk logic.
+3. Add storage upload QA notes for a real Supabase project.

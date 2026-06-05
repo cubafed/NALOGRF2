@@ -45,6 +45,8 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 6. Click `Сохранить отчет`.
 7. Open `/saved-reports` and confirm the saved report row appears.
 8. Open a saved report detail page.
+9. Select a PDF file and click `Загрузить PDF`.
+10. Confirm the attached file metadata appears in the report files list.
 
 The app must continue to work when Supabase env vars are absent.
 
@@ -61,9 +63,17 @@ Planned rules:
 - private bucket;
 - users can access only their own folder: `user_id/*`;
 - raw CSV uploads are not automatic;
-- a future PR may add an explicit upload-to-storage action.
+- PR11 supports explicit PDF attachments for saved reports only.
 
-Do not create the bucket from app code in this PR.
+Do not create the bucket from app code. Create it in Supabase as a private bucket.
 
-Payment, tax filing, exchange APIs, storage upload, external analytics, and
-server-side PDF generation are not implemented.
+Recommended storage policy principle:
+
+- authenticated users can insert objects only where `bucket_id = 'crypto-audit-user-files'`;
+- authenticated users can select/delete objects only when the first folder segment
+  in `storage.objects.name` equals `auth.uid()::text`;
+- keep the bucket private;
+- do not allow public anonymous reads.
+
+Payment, tax filing, exchange APIs, raw CSV upload, automatic upload, external
+analytics, and server-side PDF generation are not implemented.

@@ -610,6 +610,28 @@ textarea {
   padding: 5px 10px;
 }
 
+.report-file-list {
+  display: grid;
+  gap: 10px;
+}
+
+.report-file-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 140px 110px 170px auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  padding: 12px;
+}
+
+.report-file-row small {
+  display: block;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
 .btn:disabled {
   cursor: not-allowed;
   opacity: 0.62;
@@ -646,7 +668,8 @@ code {
   .upload-grid,
   .partner-hero-grid,
   .partner-flow-list,
-  .saved-report-row {
+  .saved-report-row,
+  .report-file-row {
     grid-template-columns: 1fr;
   }
 
