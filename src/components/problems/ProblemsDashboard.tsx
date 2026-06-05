@@ -74,7 +74,7 @@ export function ProblemsDashboard() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <Link href="/report" className="btn btn-primary" style={{ fontSize: "13px" }}>
-            Сформировать preview отчета
+            Сформировать предпросмотр отчета
           </Link>
           <button
             type="button"
@@ -144,8 +144,8 @@ export function ProblemsDashboard() {
 
           {findings.length === 0 ? (
             <p className="muted">
-              Review findings не найдены. Это не является налоговой, юридической, финансовой или
-              AML-консультацией.
+              Проблемы для проверки не найдены. Это не является налоговой, юридической,
+              финансовой или AML-консультацией.
             </p>
           ) : (
             <>

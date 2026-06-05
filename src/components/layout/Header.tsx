@@ -8,7 +8,7 @@ export function Header() {
           <span className="brand-mark">CA</span>
           <span>
             <strong>Crypto Audit Report</strong>
-            <small>Source-of-Funds audit preview</small>
+            <small>Предпросмотр отчета</small>
           </span>
         </Link>
         <nav className="nav" aria-label="Основные разделы">

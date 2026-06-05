@@ -14,8 +14,8 @@ export function ReportPreviewPanel({ report }: { report: DemoReport }) {
       <div className="panel-inner">
         <div className="panel-head">
           <div>
-            <p className="eyebrow">Report preview</p>
-            <h2 style={{ margin: 0 }}>Source-of-Funds readiness</h2>
+            <p className="eyebrow">Предпросмотр отчета</p>
+            <h2 style={{ margin: 0 }}>Готовность по источнику средств</h2>
           </div>
           <span className="badge">Демо-данные</span>
         </div>

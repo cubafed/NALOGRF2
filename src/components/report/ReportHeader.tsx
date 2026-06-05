@@ -9,7 +9,7 @@ export function ReportHeader({ fileName, savedAt }: ReportHeaderProps) {
       <div className="panel-inner">
         <div className="panel-head">
           <div>
-            <p className="eyebrow">Preview отчета</p>
+            <p className="eyebrow">Предпросмотр отчета</p>
             <h2 style={{ margin: 0 }}>Отчет для проверки источника средств</h2>
           </div>
           <span className="badge">Локальный сеанс</span>

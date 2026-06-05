@@ -20,13 +20,13 @@ export function ReportFindingsSection({ findings }: ReportFindingsSectionProps) 
   return (
     <section className="panel">
       <div className="panel-inner">
-        <p className="eyebrow">Проблемы для проверки</p>
-        <h2 style={{ margin: "0 0 16px" }}>Review findings</h2>
+        <p className="eyebrow">Список проблем</p>
+        <h2 style={{ margin: "0 0 16px" }}>Проблемы для проверки</h2>
 
         {findings.length === 0 ? (
           <p className="muted">
-            Review findings не найдены. Это не является налоговой, юридической, финансовой или
-            AML-консультацией.
+            Проблемы для проверки не найдены. Это не является налоговой, юридической, финансовой
+            или AML-консультацией.
           </p>
         ) : (
           <div className="review-findings-grid">

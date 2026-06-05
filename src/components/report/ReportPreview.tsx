@@ -44,7 +44,7 @@ export function ReportPreview() {
       <div className="row-between">
         <div>
           <p className="eyebrow">Навигация</p>
-          <h2 style={{ margin: 0 }}>Структурированный preview</h2>
+          <h2 style={{ margin: 0 }}>Структурированный предпросмотр</h2>
         </div>
         <Link
           href="/problems"

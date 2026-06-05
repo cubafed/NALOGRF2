@@ -215,8 +215,8 @@ function ReviewFindingsPanel({ result }: { result: RiskEngineResult }) {
       <div className="panel-inner">
         <div className="panel-head">
           <div>
-            <p className="eyebrow">Review findings</p>
-            <h2 style={{ margin: 0 }}>Source-of-funds gaps and review items</h2>
+            <p className="eyebrow">Проблемы для проверки</p>
+            <h2 style={{ margin: 0 }}>Пробелы по источнику средств и проблемы для проверки</h2>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <span className="badge">{formatReadinessLabel(result.readinessLabel)}</span>
@@ -250,8 +250,8 @@ function ReviewFindingsPanel({ result }: { result: RiskEngineResult }) {
 
         {result.findings.length === 0 ? (
           <p className="muted" style={{ marginTop: "16px" }}>
-            Review findings не найдены. Это не является налоговой, юридической, финансовой
-            или AML-консультацией.
+            Проблемы для проверки не найдены. Это не является налоговой, юридической,
+            финансовой или AML-консультацией.
           </p>
         ) : (
           <div className="review-findings-grid">
