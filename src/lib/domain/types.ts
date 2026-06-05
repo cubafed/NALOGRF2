@@ -20,15 +20,25 @@ export interface ReportPeriod {
 
 export interface Transaction {
   id: string;
-  date: string;
-  source: string;
+  date?: string;
+  timestamp?: string;
+  source?: string;
   type: TransactionType;
   asset: string;
   amount: string;
-  fiatValue: string | null;
-  counterparty: string | null;
-  status: "ok" | "needs_review" | "missing_data";
-  findingRuleIds: string[];
+  price?: string;
+  fiatValue?: string | null;
+  fiatCurrency?: string;
+  feeAmount?: string;
+  feeAsset?: string;
+  txHash?: string;
+  orderId?: string;
+  counterparty?: string | null;
+  notes?: string;
+  status?: "ok" | "needs_review" | "missing_data";
+  findingRuleIds?: string[];
+  rawRowNumber?: number;
+  originalType?: string;
 }
 
 export interface Finding {
