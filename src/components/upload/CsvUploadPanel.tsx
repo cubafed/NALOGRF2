@@ -4,6 +4,8 @@ import { ChangeEvent, useMemo, useRef, useState } from "react";
 import { sampleUniversalCsv } from "@/lib/demo/sample-universal-csv";
 import type { ParseUniversalCsvResult } from "@/lib/parsers/parser-types";
 import { parseUniversalCsv } from "@/lib/parsers/universal-csv-parser";
+import type { ReadinessLabel, RiskEngineResult, RiskFinding } from "@/lib/risk/risk-types";
+import { runRiskEngine } from "@/lib/risk/run-risk-engine";
 import { ImportErrors } from "@/components/upload/ImportErrors";
 import { ImportSummary } from "@/components/upload/ImportSummary";
 import { ImportWarnings } from "@/components/upload/ImportWarnings";
@@ -42,6 +44,10 @@ export function CsvUploadPanel() {
   const [isReading, setIsReading] = useState(false);
 
   const expectedColumnText = useMemo(() => expectedColumns.join(", "), []);
+  const riskResult = useMemo(
+    () => (uploadState ? runRiskEngine(uploadState.result.transactions) : null),
+    [uploadState],
+  );
 
   const parseCsvText = (fileName: string, csvText: string) => {
     const result = parseUniversalCsv(csvText);
@@ -184,6 +190,7 @@ export function CsvUploadPanel() {
             </span>
           </div>
           <ImportSummary summary={uploadState.result.summary} />
+          {riskResult && <ReviewFindingsPanel result={riskResult} />}
           <TransactionPreviewTable transactions={uploadState.result.transactions} />
           <ImportWarnings warnings={uploadState.result.warnings} />
           <ImportErrors errors={uploadState.result.errors} />
@@ -192,4 +199,91 @@ export function CsvUploadPanel() {
       )}
     </div>
   );
+}
+
+function ReviewFindingsPanel({ result }: { result: RiskEngineResult }) {
+  return (
+    <section className="panel">
+      <div className="panel-inner">
+        <div className="panel-head">
+          <div>
+            <p className="eyebrow">Review findings</p>
+            <h2 style={{ margin: 0 }}>Source-of-funds gaps and review items</h2>
+          </div>
+          <span className="badge">{formatReadinessLabel(result.readinessLabel)}</span>
+        </div>
+
+        <div className="metric-grid">
+          <div className="metric">
+            <span>Readiness score</span>
+            <strong>{result.readinessScore}/100</strong>
+          </div>
+          <div className="metric">
+            <span>Total findings</span>
+            <strong>{result.summary.totalFindings}</strong>
+          </div>
+          <div className="metric">
+            <span>Critical / medium / low</span>
+            <strong>
+              {result.summary.criticalCount} / {result.summary.mediumCount} /{" "}
+              {result.summary.lowCount}
+            </strong>
+          </div>
+          <div className="metric">
+            <span>Affected transactions</span>
+            <strong>{result.summary.affectedTransactionCount}</strong>
+          </div>
+        </div>
+
+        {result.findings.length === 0 ? (
+          <p className="muted" style={{ marginTop: "16px" }}>
+            Review findings не найдены. Это не является налоговой, юридической, финансовой
+            или AML-консультацией.
+          </p>
+        ) : (
+          <div className="review-findings-grid">
+            {result.findings.map((finding) => (
+              <ReviewFindingCard finding={finding} key={finding.id} />
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function ReviewFindingCard({ finding }: { finding: RiskFinding }) {
+  return (
+    <article className="finding">
+      <span className={`severity severity-${finding.severity}`}>{finding.severity}</span>
+      <div>
+        <h3 style={{ margin: "0 0 6px" }}>{finding.title}</h3>
+        <p className="muted" style={{ margin: 0 }}>
+          Rule ID: <strong>{finding.ruleId}</strong>
+        </p>
+      </div>
+      <p style={{ margin: 0 }}>{finding.explanation}</p>
+      <p className="muted" style={{ margin: 0 }}>
+        <strong>Why it matters:</strong> {finding.whyItMatters}
+      </p>
+      <p className="muted" style={{ margin: 0 }}>
+        <strong>Recommended action:</strong> {finding.recommendedAction}
+      </p>
+      <p className="muted" style={{ margin: 0 }}>
+        <strong>Documents:</strong> {finding.documentsNeeded.join(", ")}
+      </p>
+      <p className="muted" style={{ margin: 0 }}>
+        <strong>Affected raw rows:</strong>{" "}
+        {finding.affectedRawRowNumbers.length > 0
+          ? finding.affectedRawRowNumbers.join(", ")
+          : "—"}
+      </p>
+    </article>
+  );
+}
+
+function formatReadinessLabel(label: ReadinessLabel): string {
+  if (label === "good") return "Good";
+  if (label === "needs_review") return "Needs review";
+  return "High risk";
 }
