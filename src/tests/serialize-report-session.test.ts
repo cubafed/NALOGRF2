@@ -103,11 +103,12 @@ describe("serializeReportSession", () => {
     expect(JSON.stringify(draft)).not.toContain("RAW CSV CONTENT SHOULD NOT LEAK");
   });
 
-  it("preserves readiness score and risk summary", () => {
+  it("preserves report preview, readiness score and risk summary", () => {
     const draft = serializeReportSession({ session, report });
 
     expect(draft.readinessScore).toBe(64);
     expect(draft.riskSummary).toEqual(session.riskResult.summary);
+    expect(draft.reportPreview).toEqual(report);
   });
 
   it("includes partner attribution if present", () => {

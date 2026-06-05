@@ -4,13 +4,11 @@ import type {
   SavedReportService,
   SaveReportResult,
 } from "@/lib/persistence/saved-report-types";
-
-const localOnlyMessage =
-  "Облачное сохранение не настроено. Сейчас отчет доступен только в локальном браузерном сеансе.";
+import { savedReportErrors } from "@/lib/persistence/saved-report-errors";
 
 export class LocalSavedReportService implements SavedReportService {
   async saveReport(_draft: SavedReportDraft): Promise<SaveReportResult> {
-    return { ok: false, error: localOnlyMessage };
+    return { ok: false, error: savedReportErrors.localOnly };
   }
 
   async listReports(): Promise<SavedReportRecord[]> {
@@ -22,7 +20,7 @@ export class LocalSavedReportService implements SavedReportService {
   }
 
   async deleteReport(_id: string): Promise<{ ok: boolean; error?: string }> {
-    return { ok: false, error: localOnlyMessage };
+    return { ok: false, error: savedReportErrors.localOnly };
   }
 }
 

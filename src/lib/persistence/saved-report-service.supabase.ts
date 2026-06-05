@@ -1,40 +1,16 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   SavedReportDraft,
-  SavedReportRecord,
   SavedReportService,
   SaveReportResult,
 } from "@/lib/persistence/saved-report-types";
 import type { Database, Json } from "@/lib/supabase/types";
-
-type SavedReportRow = Database["public"]["Tables"]["saved_reports"]["Row"];
+import { savedReportErrors } from "@/lib/persistence/saved-report-errors";
+import { mapSavedReportRow } from "@/lib/persistence/saved-report-mappers";
+import type { SavedReportRecord } from "@/lib/persistence/saved-report-types";
 
 function toJson(value: unknown): Json {
   return JSON.parse(JSON.stringify(value)) as Json;
-}
-
-function mapRow(row: SavedReportRow): SavedReportRecord {
-  return {
-    id: row.id,
-    userId: row.user_id,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-    title: row.title,
-    fileName: row.file_name,
-    readinessScore: row.readiness_score,
-    readinessLabel:
-      row.readiness_label === "good" ||
-      row.readiness_label === "needs_review" ||
-      row.readiness_label === "high_risk"
-        ? row.readiness_label
-        : "needs_review",
-    parserSummary: row.parser_summary as unknown as SavedReportDraft["parserSummary"],
-    riskSummary: row.risk_summary as unknown as SavedReportDraft["riskSummary"],
-    reportPreview: row.report_preview as unknown as SavedReportDraft["reportPreview"],
-    partnerAttribution:
-      row.partner_attribution as unknown as SavedReportDraft["partnerAttribution"],
-    sourceType: "local_upload",
-  };
 }
 
 export class SupabaseSavedReportService implements SavedReportService {
@@ -42,14 +18,14 @@ export class SupabaseSavedReportService implements SavedReportService {
 
   async saveReport(draft: SavedReportDraft): Promise<SaveReportResult> {
     if (!this.client) {
-      return { ok: false, error: "Supabase не настроен." };
+      return { ok: false, error: savedReportErrors.supabaseUnavailable };
     }
 
     const userResult = await this.client.auth.getUser();
     const user = userResult.data.user;
 
     if (!user) {
-      return { ok: false, error: "Войдите в аккаунт, чтобы сохранить отчет." };
+      return { ok: false, error: savedReportErrors.authRequired };
     }
 
     const insertResult = await this.client
@@ -75,7 +51,7 @@ export class SupabaseSavedReportService implements SavedReportService {
       return { ok: false, error: insertResult.error.message };
     }
 
-    return { ok: true, record: mapRow(insertResult.data) };
+    return { ok: true, record: mapSavedReportRow(insertResult.data) };
   }
 
   async listReports(): Promise<SavedReportRecord[]> {
@@ -92,7 +68,7 @@ export class SupabaseSavedReportService implements SavedReportService {
       return [];
     }
 
-    return result.data.map(mapRow);
+    return result.data.map(mapSavedReportRow);
   }
 
   async getReport(id: string): Promise<SavedReportRecord | null> {
@@ -110,12 +86,12 @@ export class SupabaseSavedReportService implements SavedReportService {
       return null;
     }
 
-    return mapRow(result.data);
+    return mapSavedReportRow(result.data);
   }
 
   async deleteReport(id: string): Promise<{ ok: boolean; error?: string }> {
     if (!this.client) {
-      return { ok: false, error: "Supabase не настроен." };
+      return { ok: false, error: savedReportErrors.supabaseUnavailable };
     }
 
     const result = await this.client.from("saved_reports").delete().eq("id", id);

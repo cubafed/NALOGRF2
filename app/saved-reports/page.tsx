@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { AuthStatus } from "@/components/auth/AuthStatus";
 import { Header } from "@/components/layout/Header";
 import { FooterDisclaimer } from "@/components/layout/FooterDisclaimer";
+import { SavedReportsList } from "@/components/persistence/SavedReportsList";
 import { SupabaseUnavailableNotice } from "@/components/persistence/SupabaseUnavailableNotice";
 import { createSupabaseSavedReportService } from "@/lib/persistence/saved-report-service.supabase";
 import type { SavedReportRecord } from "@/lib/persistence/saved-report-types";
@@ -106,24 +107,7 @@ export default function SavedReportsPage() {
                   </div>
                 )}
 
-                {state.status === "ready" && (
-                  <div className="report-list">
-                    {state.reports.length === 0 ? (
-                      <p className="muted">
-                        Сохраненных отчетов пока нет. Сохранение выполняется только
-                        после явного действия пользователя на `/report`.
-                      </p>
-                    ) : (
-                      state.reports.map((report) => (
-                        <div className="report-row" key={report.id}>
-                          <span>{report.readinessScore}/100</span>
-                          <strong>{report.title}</strong>
-                          <span>{new Date(report.createdAt).toLocaleDateString("ru-RU")}</span>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
+                {state.status === "ready" && <SavedReportsList reports={state.reports} />}
               </div>
             </section>
           </div>

@@ -40,8 +40,21 @@ export function AuthStatus() {
       );
     });
 
+    const subscription = client.auth.onAuthStateChange((_event, session) => {
+      if (!active) {
+        return;
+      }
+
+      setAuthState(
+        session?.user
+          ? { status: "signed_in", email: session.user.email ?? null }
+          : { status: "signed_out" },
+      );
+    });
+
     return () => {
       active = false;
+      subscription.data.subscription.unsubscribe();
     };
   }, []);
 

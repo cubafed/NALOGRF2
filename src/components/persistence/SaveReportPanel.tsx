@@ -10,6 +10,8 @@ import type { ReportPreviewModel } from "@/lib/report/report-types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { getSupabaseBrowserConfig } from "@/lib/supabase/config";
 import { SupabaseUnavailableNotice } from "@/components/persistence/SupabaseUnavailableNotice";
+import { SaveReportButton } from "@/components/persistence/SaveReportButton";
+import { SavedReportStatus } from "@/components/persistence/SavedReportStatus";
 
 interface SaveReportPanelProps {
   session: ImportSession;
@@ -22,7 +24,9 @@ export function SaveReportPanel({ session, report }: SaveReportPanelProps) {
   const [authState, setAuthState] = useState<SavePanelAuthState>(() => {
     return getSupabaseBrowserConfig().configured ? "loading" : "unconfigured";
   });
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ text: string; tone: "success" | "error" } | null>(
+    null,
+  );
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -43,8 +47,17 @@ export function SaveReportPanel({ session, report }: SaveReportPanelProps) {
       setAuthState(result.data.user ? "signed_in" : "signed_out");
     });
 
+    const subscription = client.auth.onAuthStateChange((_event, nextSession) => {
+      if (!active) {
+        return;
+      }
+
+      setAuthState(nextSession?.user ? "signed_in" : "signed_out");
+    });
+
     return () => {
       active = false;
+      subscription.data.subscription.unsubscribe();
     };
   }, []);
 
@@ -110,7 +123,11 @@ export function SaveReportPanel({ session, report }: SaveReportPanelProps) {
     const result = await service.saveReport(draft);
 
     setIsSaving(false);
-    setMessage(result.ok ? "Отчет сохранен." : result.error);
+    setMessage(
+      result.ok
+        ? { text: "Отчет сохранен. Он появится на странице сохраненных отчетов.", tone: "success" }
+        : { text: result.error, tone: "error" },
+    );
   };
 
   return (
@@ -121,20 +138,13 @@ export function SaveReportPanel({ session, report }: SaveReportPanelProps) {
             <p className="eyebrow">Сохранить отчет</p>
             <h2 style={{ margin: 0 }}>Облачное сохранение</h2>
           </div>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={handleSave}
-            disabled={isSaving}
-          >
-            {isSaving ? "Сохранение..." : "Сохранить отчет"}
-          </button>
+          <SaveReportButton isSaving={isSaving} onSave={handleSave} />
         </div>
         <p className="muted" style={{ marginBottom: 0 }}>
           Данные сохраняются только после явного действия пользователя. Raw CSV не
           загружается автоматически.
         </p>
-        {message && <p className="muted">{message}</p>}
+        <SavedReportStatus message={message?.text ?? null} tone={message?.tone} />
       </div>
     </section>
   );

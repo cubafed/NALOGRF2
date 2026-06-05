@@ -60,9 +60,12 @@ Primary message:
 - `/partners/accountants` — static partner page for accountants and tax
   consultants. This is not tax advice and not a filing engine.
 - `/account` — optional Supabase auth foundation. The app works when Supabase is
-  not configured.
-- `/saved-reports` — optional saved reports foundation. Shows unavailable or
-  authenticated placeholder states depending on Supabase/auth state.
+  not configured. When Supabase is configured, it supports email magic-link sign-in
+  and sign-out.
+- `/saved-reports` — optional saved reports list. Shows unavailable/sign-in states
+  without Supabase/auth, and lists authenticated Supabase `saved_reports` rows when
+  available.
+- `/saved-reports/[id]` — saved report metadata/detail view from the persisted row.
 
 ## Local Partner Attribution
 
@@ -80,12 +83,36 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 ```
 
-When configured, `/account` exposes a basic email magic-link sign-in skeleton and
-`/report` can attempt an explicit authenticated save of a serialized report
-draft. Raw CSV files are not uploaded automatically, and no service role keys are
-used in browser code.
+When configured, `/account` exposes email magic-link sign-in and sign-out.
+`/report` can explicitly save the current serialized report draft for an
+authenticated user. `/saved-reports` lists saved report metadata and links to
+`/saved-reports/[id]`.
+
+Raw CSV files are not uploaded automatically, storage upload is not implemented,
+and no service role keys are used in browser code.
 
 Database schema and storage notes live in `supabase/`.
+
+## Supabase Manual Verification
+
+1. Create `.env.local`:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+```
+
+2. Apply `supabase/migrations/0001_initial_schema.sql` to the Supabase project.
+3. Start the dev server with `npm run dev`.
+4. Open `/account` and sign in with email magic link.
+5. Open `/upload` and use the sample CSV.
+6. Go to `/problems`, then `/report`.
+7. Click `Сохранить отчет`.
+8. Open `/saved-reports` and confirm the saved report appears.
+9. Open the saved report detail page.
+
+PR10 does not implement storage upload, payment, tax filing, exchange APIs,
+external analytics, or server-side PDF generation.
 
 ## Setup
 
@@ -107,6 +134,6 @@ The production build does not require environment variables.
 
 ## Next Planned PRs
 
-1. Add Supabase project QA with a real test project and documented manual setup.
-2. Add explicit file upload-to-storage action for authenticated users.
-3. Add saved report detail view without changing parser/risk logic.
+1. Add explicit file upload-to-storage action for authenticated users.
+2. Add saved report delete/archive UI.
+3. Add saved report detail polish without changing parser/risk logic.
