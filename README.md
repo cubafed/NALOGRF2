@@ -36,6 +36,18 @@ Primary message:
 - Country-specific tax filing.
 - AI-generated calculations.
 
+## Pages
+
+- `/` — landing.
+- `/demo` — static demo report.
+- `/upload` — browser-only CSV import, parser preview and review findings.
+- `/problems` — problems dashboard built from the latest local import/risk session.
+- `/report` — browser-only structured report preview built from the latest local
+  import/risk session (`src/lib/report/`). Not PDF generation. Reads the session
+  from `sessionStorage`, summarizes findings, groups documents, and derives
+  deterministic review questions from existing findings. Shows an empty state with
+  a CTA to `/upload` when no local session exists.
+
 ## Setup
 
 ```bash

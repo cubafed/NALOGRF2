@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   loadLatestImportSession,
   clearLatestImportSession,
@@ -71,14 +72,19 @@ export function ProblemsDashboard() {
           <p className="eyebrow">Локальный сеанс</p>
           <h2 style={{ margin: 0 }}>{fileName ?? "Без имени файла"}</h2>
         </div>
-        <button
-          type="button"
-          className="btn"
-          style={{ fontSize: "12px", opacity: 0.7 }}
-          onClick={handleClear}
-        >
-          Очистить локальные данные
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <Link href="/report" className="btn btn-primary" style={{ fontSize: "13px" }}>
+            Сформировать preview отчета
+          </Link>
+          <button
+            type="button"
+            className="btn"
+            style={{ fontSize: "12px", opacity: 0.7 }}
+            onClick={handleClear}
+          >
+            Очистить локальные данные
+          </button>
+        </div>
       </div>
 
       {/* Privacy and disclaimer notes */}
