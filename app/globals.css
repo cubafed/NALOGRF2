@@ -482,6 +482,14 @@ textarea {
   transform: none;
 }
 
+code {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #dcecff;
+  padding: 2px 6px;
+}
+
 @media (max-width: 900px) {
   .topbar-inner,
   .panel-head,
@@ -527,5 +535,136 @@ textarea {
 
   .hero h1 {
     font-size: 42px;
+  }
+}
+
+@media print {
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #ffffff;
+    --panel: #ffffff;
+    --panel-2: #ffffff;
+    --line: #d9dde3;
+    --ink: #111827;
+    --muted: #4b5563;
+    --blue: #0f62c7;
+    --blue-soft: #eef6ff;
+    --green: #047857;
+    --amber: #92400e;
+    --red: #b91c1c;
+  }
+
+  @page {
+    margin: 14mm;
+  }
+
+  html,
+  body {
+    min-height: auto;
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  body {
+    font-size: 11pt;
+    line-height: 1.42;
+  }
+
+  .topbar,
+  .footer-disclaimer,
+  .print-hidden,
+  .btn,
+  button {
+    display: none !important;
+  }
+
+  .container {
+    width: 100%;
+    margin: 0;
+  }
+
+  main .container {
+    padding: 0 !important;
+  }
+
+  .upload-stack,
+  .print-report-root {
+    display: block;
+  }
+
+  .panel {
+    overflow: visible;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #d9dde3;
+    border-radius: 0;
+    background: #ffffff !important;
+    box-shadow: none;
+    color: #111827;
+    margin: 0 0 10mm;
+  }
+
+  .panel::before {
+    display: none;
+  }
+
+  .panel-inner {
+    padding: 12px;
+  }
+
+  .panel-head,
+  .row-between {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .eyebrow {
+    color: #0f62c7;
+  }
+
+  .muted,
+  .brand small {
+    color: #4b5563 !important;
+  }
+
+  .badge,
+  .severity {
+    border: 1px solid #d9dde3;
+    background: #f3f6fa !important;
+    color: #111827 !important;
+  }
+
+  .metric,
+  .card,
+  .finding {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border-color: #d9dde3;
+    background: #ffffff !important;
+  }
+
+  .metric-grid,
+  .review-findings-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .score {
+    font-size: 42pt;
+  }
+
+  h1 {
+    font-size: 24pt;
+  }
+
+  h2 {
+    font-size: 17pt;
+  }
+
+  h3 {
+    font-size: 13pt;
+  }
+
+  a {
+    color: #111827;
   }
 }

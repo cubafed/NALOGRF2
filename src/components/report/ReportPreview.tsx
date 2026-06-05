@@ -15,6 +15,7 @@ import { ReportDocumentsSection } from "./ReportDocumentsSection";
 import { ReportQuestionsSection } from "./ReportQuestionsSection";
 import { ReportDisclaimer } from "./ReportDisclaimer";
 import { ReportEmptyState } from "./ReportEmptyState";
+import { ReportPrintActions } from "./ReportPrintActions";
 
 export function ReportPreview() {
   const [session, setSession] = useState<ImportSession | null | "loading">("loading");
@@ -41,7 +42,7 @@ export function ReportPreview() {
 
   return (
     <div className="upload-stack">
-      <div className="row-between">
+      <div className="row-between print-hidden">
         <div>
           <p className="eyebrow">Навигация</p>
           <h2 style={{ margin: 0 }}>Структурированный предпросмотр</h2>
@@ -55,20 +56,24 @@ export function ReportPreview() {
         </Link>
       </div>
 
-      <ReportHeader fileName={model.fileName} savedAt={model.savedAt} />
-      <ReportSummary
-        readinessScore={model.readinessScore}
-        readinessLabel={model.readinessLabel}
-        riskSummary={model.riskSummary}
-      />
-      <ReportImportDetails parserSummary={model.parserSummary} />
-      <ReportFindingsSection findings={model.findings} />
-      <ReportDocumentsSection
-        documentsNeeded={model.documentsNeeded}
-        affectedRows={model.affectedRows}
-      />
-      <ReportQuestionsSection questions={model.generatedQuestions} />
-      <ReportDisclaimer disclaimer={model.disclaimer} />
+      <ReportPrintActions report={model} />
+
+      <div className="print-report-root">
+        <ReportHeader fileName={model.fileName} savedAt={model.savedAt} />
+        <ReportSummary
+          readinessScore={model.readinessScore}
+          readinessLabel={model.readinessLabel}
+          riskSummary={model.riskSummary}
+        />
+        <ReportImportDetails parserSummary={model.parserSummary} />
+        <ReportFindingsSection findings={model.findings} />
+        <ReportDocumentsSection
+          documentsNeeded={model.documentsNeeded}
+          affectedRows={model.affectedRows}
+        />
+        <ReportQuestionsSection questions={model.generatedQuestions} />
+        <ReportDisclaimer disclaimer={model.disclaimer} />
+      </div>
     </div>
   );
 }
