@@ -24,6 +24,9 @@ export default function HomePage() {
               <Link href="/demo" className="btn btn-primary">
                 Открыть демо
               </Link>
+              <Link href="/upload" className="btn btn-secondary">
+                Проверить CSV
+              </Link>
             </div>
             <div className="grid-3">
               {demoReport.findings.slice(0, 3).map((finding) => (
