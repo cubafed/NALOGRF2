@@ -8,13 +8,15 @@ export function Header() {
           <span className="brand-mark">CA</span>
           <span>
             <strong>Crypto Audit Report</strong>
-            <small>Source-of-Funds audit preview</small>
+            <small>Предпросмотр отчета</small>
           </span>
         </Link>
         <nav className="nav" aria-label="Основные разделы">
           <Link href="/">Главная</Link>
           <Link href="/demo">Демо-отчет</Link>
           <Link href="/upload">Загрузить CSV</Link>
+          <Link href="/problems">Проблемы</Link>
+          <Link href="/report">Отчет</Link>
           <span className="nav-placeholder" aria-disabled="true">
             Для партнеров
           </span>

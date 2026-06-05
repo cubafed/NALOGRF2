@@ -1,11 +1,11 @@
 # Crypto PR Guard
 
 Use this skill when implementing or reviewing work in the `Crypto Audit Report` repository.
-It is a scope, safety, and validation checklist for future Codex tasks.
+It is a scope, safety, and validation checklist for Claude Code tasks.
 
 ## Scope Control
 
-- Confirm the target directory is `/Users/daviddaler/Documents/crypto-audit-report`.
+- Confirm the working repository is `cubafed/NALOGRF2`.
 - Identify the approved PR number and brief before editing.
 - Keep the PR to one narrow feature.
 - Do not add future features, routes, services, or integrations unless explicitly approved.

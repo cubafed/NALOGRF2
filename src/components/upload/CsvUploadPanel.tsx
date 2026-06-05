@@ -1,11 +1,16 @@
 "use client";
 
 import { ChangeEvent, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { sampleUniversalCsv } from "@/lib/demo/sample-universal-csv";
 import type { ParseUniversalCsvResult } from "@/lib/parsers/parser-types";
 import { parseUniversalCsv } from "@/lib/parsers/universal-csv-parser";
 import type { ReadinessLabel, RiskEngineResult, RiskFinding } from "@/lib/risk/risk-types";
 import { runRiskEngine } from "@/lib/risk/run-risk-engine";
+import {
+  saveLatestImportSession,
+  buildImportSession,
+} from "@/lib/client/import-session-storage";
 import { ImportErrors } from "@/components/upload/ImportErrors";
 import { ImportSummary } from "@/components/upload/ImportSummary";
 import { ImportWarnings } from "@/components/upload/ImportWarnings";
@@ -53,6 +58,9 @@ export function CsvUploadPanel() {
     const result = parseUniversalCsv(csvText);
     setUploadState({ fileName, result });
     setUiError(null);
+    // Save to browser session storage for /problems
+    const riskRes = runRiskEngine(result.transactions);
+    saveLatestImportSession(buildImportSession(fileName, result, riskRes));
   };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -207,10 +215,15 @@ function ReviewFindingsPanel({ result }: { result: RiskEngineResult }) {
       <div className="panel-inner">
         <div className="panel-head">
           <div>
-            <p className="eyebrow">Review findings</p>
-            <h2 style={{ margin: 0 }}>Source-of-funds gaps and review items</h2>
+            <p className="eyebrow">Проблемы для проверки</p>
+            <h2 style={{ margin: 0 }}>Пробелы по источнику средств и проблемы для проверки</h2>
           </div>
-          <span className="badge">{formatReadinessLabel(result.readinessLabel)}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <span className="badge">{formatReadinessLabel(result.readinessLabel)}</span>
+            <Link href="/problems" className="btn btn-primary" style={{ fontSize: "13px" }}>
+              Посмотреть проблемы
+            </Link>
+          </div>
         </div>
 
         <div className="metric-grid">
@@ -237,8 +250,8 @@ function ReviewFindingsPanel({ result }: { result: RiskEngineResult }) {
 
         {result.findings.length === 0 ? (
           <p className="muted" style={{ marginTop: "16px" }}>
-            Review findings не найдены. Это не является налоговой, юридической, финансовой
-            или AML-консультацией.
+            Проблемы для проверки не найдены. Это не является налоговой, юридической,
+            финансовой или AML-консультацией.
           </p>
         ) : (
           <div className="review-findings-grid">
