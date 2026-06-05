@@ -476,6 +476,50 @@ textarea {
   margin-top: 18px;
 }
 
+.partner-hero {
+  padding-top: 58px;
+}
+
+.partner-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 0.78fr);
+  gap: clamp(24px, 5vw, 58px);
+  align-items: center;
+}
+
+.partner-hero h1 {
+  max-width: 900px;
+  margin: 0 0 18px;
+  font-size: clamp(38px, 5.4vw, 72px);
+  font-weight: 950;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.partner-card-link {
+  display: block;
+  min-height: 100%;
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.partner-card-link:hover {
+  border-color: rgba(26, 130, 255, 0.42);
+  transform: translateY(-1px);
+}
+
+.partner-flow-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.attribution-card {
+  border-color: rgba(26, 130, 255, 0.32);
+  background: linear-gradient(180deg, rgba(26, 130, 255, 0.09), rgba(255, 255, 255, 0.025));
+}
+
 .btn:disabled {
   cursor: not-allowed;
   opacity: 0.62;
@@ -509,7 +553,9 @@ code {
   .hero,
   .grid-3,
   .review-findings-grid,
-  .upload-grid {
+  .upload-grid,
+  .partner-hero-grid,
+  .partner-flow-list {
     grid-template-columns: 1fr;
   }
 

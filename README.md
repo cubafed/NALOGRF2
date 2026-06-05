@@ -6,31 +6,34 @@ Primary message:
 
 > Подготовьте криптоисторию для банка, бухгалтера и налоговой
 
-## Current PR #1 Scope
+## Current Scope
 
 - New standalone Next.js + TypeScript + Tailwind app.
 - Landing page at `/`.
 - Static demo report page at `/demo`.
-- Stable TypeScript domain types.
-- Typed demo fixture.
-- Vitest tests for demo data consistency.
+- Browser-only Universal CSV upload preview at `/upload`.
+- Deterministic review finding engine and problems dashboard.
+- Browser-only report preview and print/save-as-PDF action.
+- Static partner pages and local partner attribution skeleton.
+- Stable TypeScript domain and partner types.
+- Vitest tests for demo data, parser, storage, risk, report, and partner attribution.
 
 ## What Is Mocked
 
 - Demo audit data.
-- Risk and readiness metrics.
-- Findings and report preview sections.
-- Calls to future upload, PDF, partner, and payment flows are placeholders only.
+- Partner referral metadata and demo partner links.
+- Future exchange/accountant partner flows.
+- PDF export filename suggestion; browser print controls final save behavior.
 
 ## What Is Not Implemented
 
-- CSV upload.
-- CSV parsers.
-- PDF generation.
+- Backend PDF generation.
 - Payments.
 - Auth.
 - Supabase.
 - Partner dashboard.
+- Backend analytics.
+- Affiliate payouts.
 - Exchange APIs.
 - AML checks.
 - Country-specific tax filing.
@@ -47,6 +50,19 @@ Primary message:
   from `sessionStorage`, summarizes findings, groups documents, and derives
   deterministic review questions from existing findings. Shows an empty state with
   a CTA to `/upload` when no local session exists.
+- `/partners` — static partner overview page for future exchange, accountant,
+  consultant, community, education, and OTC flows.
+- `/partners/exchanges` — static partner page for crypto exchanges and P2P
+  communities. Current MVP supports Universal CSV only.
+- `/partners/accountants` — static partner page for accountants and tax
+  consultants. This is not tax advice and not a filing engine.
+
+## Local Partner Attribution
+
+Partner links can include `partner`, `ref`, and UTM parameters. On `/upload`,
+the app parses those parameters and stores only that metadata in `localStorage`.
+No uploaded CSV data is stored in partner attribution storage, and no partner
+metadata is sent to a backend in this MVP.
 
 ## Setup
 
@@ -68,8 +84,6 @@ The production build does not require environment variables.
 
 ## Next Planned PRs
 
-1. Add deterministic CSV parser foundation for universal, Binance, and Bybit fixtures.
-2. Add upload page and import preview with validation.
-3. Add deterministic risk engine and findings from normalized transactions.
-4. Add problems and transactions pages.
-5. Add report preview snapshots and later PDF generation.
+1. Add visible report export polish after PR7/PR8 review.
+2. Add importer format planning without implementing exchange-specific parsers.
+3. Add partner conversion copy experiments without backend analytics or payouts.

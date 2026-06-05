@@ -16,6 +16,7 @@ import { ImportSummary } from "@/components/upload/ImportSummary";
 import { ImportWarnings } from "@/components/upload/ImportWarnings";
 import { RawRowsPreview } from "@/components/upload/RawRowsPreview";
 import { TransactionPreviewTable } from "@/components/upload/TransactionPreviewTable";
+import { PartnerAttributionPreview } from "@/components/partners/PartnerAttributionPreview";
 
 const expectedColumns = [
   "date",
@@ -114,6 +115,8 @@ export function CsvUploadPanel() {
 
   return (
     <div className="upload-stack">
+      <PartnerAttributionPreview />
+
       <section className="panel">
         <div className="panel-inner">
           <div className="panel-head">
