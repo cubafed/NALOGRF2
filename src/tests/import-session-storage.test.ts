@@ -2,10 +2,12 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   saveLatestImportSession,
   loadLatestImportSession,
+  loadLatestVersionedImportSession,
   clearLatestImportSession,
   buildImportSession,
   type ImportSession,
 } from "@/lib/client/import-session-storage";
+import { createVersionedImportSession } from "@/lib/client/session-schema";
 import type { ParseUniversalCsvResult } from "@/lib/parsers/parser-types";
 import type { RiskEngineResult } from "@/lib/risk/risk-types";
 
@@ -64,6 +66,7 @@ const sessionStorageMock = (() => {
 
 Object.defineProperty(global, "window", {
   value: { sessionStorage: sessionStorageMock },
+  configurable: true,
   writable: true,
 });
 
@@ -82,6 +85,48 @@ describe("saveLatestImportSession / loadLatestImportSession", () => {
     expect(loaded?.riskResult.readinessScore).toBe(100);
   });
 
+  it("stores a versioned envelope", () => {
+    saveLatestImportSession(mockSession);
+    const raw = sessionStorageMock.getItem("crypto_audit_latest_import_v1");
+
+    expect(raw).not.toBeNull();
+    const parsed: unknown = JSON.parse(raw ?? "");
+    expect(parsed).toMatchObject({
+      schemaVersion: 1,
+      savedAt: mockSession.savedAt,
+      payload: {
+        fileName: "test.csv",
+        riskResult: mockRiskResult,
+      },
+    });
+  });
+
+  it("reads a current versioned envelope and returns payload", () => {
+    const envelope = createVersionedImportSession(mockSession);
+    sessionStorageMock.setItem("crypto_audit_latest_import_v1", JSON.stringify(envelope));
+
+    const loaded = loadLatestImportSession();
+
+    expect(loaded).toEqual(mockSession);
+  });
+
+  it("reads old unversioned data and returns payload", () => {
+    sessionStorageMock.setItem("crypto_audit_latest_import_v1", JSON.stringify(mockSession));
+
+    const loaded = loadLatestImportSession();
+
+    expect(loaded).toEqual(mockSession);
+  });
+
+  it("returns a versioned envelope", () => {
+    sessionStorageMock.setItem("crypto_audit_latest_import_v1", JSON.stringify(mockSession));
+
+    const loaded = loadLatestVersionedImportSession();
+
+    expect(loaded?.schemaVersion).toBe(1);
+    expect(loaded?.payload).toEqual(mockSession);
+  });
+
   it("returns null when no session exists", () => {
     const loaded = loadLatestImportSession();
     expect(loaded).toBeNull();
@@ -91,6 +136,7 @@ describe("saveLatestImportSession / loadLatestImportSession", () => {
     sessionStorageMock.setItem("crypto_audit_latest_import_v1", "not-valid-json{{");
     const loaded = loadLatestImportSession();
     expect(loaded).toBeNull();
+    expect(loadLatestVersionedImportSession()).toBeNull();
   });
 
   it("returns null when version is wrong", () => {
@@ -128,6 +174,26 @@ describe("buildImportSession", () => {
 });
 
 describe("storage unavailable", () => {
+  it("does not crash when window is undefined", () => {
+    const originalWindow = global.window;
+    Object.defineProperty(global, "window", {
+      value: undefined,
+      configurable: true,
+      writable: true,
+    });
+
+    expect(() => saveLatestImportSession(mockSession)).not.toThrow();
+    expect(loadLatestImportSession()).toBeNull();
+    expect(loadLatestVersionedImportSession()).toBeNull();
+    expect(() => clearLatestImportSession()).not.toThrow();
+
+    Object.defineProperty(global, "window", {
+      value: originalWindow,
+      configurable: true,
+      writable: true,
+    });
+  });
+
   it("does not crash when sessionStorage is completely missing from window", () => {
     const originalStorage = (global.window as { sessionStorage?: unknown }).sessionStorage;
     // Simulate missing sessionStorage by making it throw on access

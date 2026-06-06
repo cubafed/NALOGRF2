@@ -1,8 +1,14 @@
 import type { ParseUniversalCsvResult, ParserSummary, ParserWarning, ParserError, RawCsvRow } from "@/lib/parsers/parser-types";
 import type { RiskEngineResult } from "@/lib/risk/risk-types";
 import type { Transaction } from "@/lib/domain/types";
+import {
+  createVersionedImportSession,
+  type ImportSessionPayload,
+  type VersionedImportSession,
+} from "@/lib/client/session-schema";
+import { migrateImportSession } from "@/lib/client/session-migrations";
 
-export interface ImportSession {
+export interface ImportSession extends ImportSessionPayload {
   version: 1;
   savedAt: string;
   fileName: string | null;
@@ -29,30 +35,28 @@ export function saveLatestImportSession(session: ImportSession): void {
   const storage = getStorage();
   if (!storage) return;
   try {
-    storage.setItem(STORAGE_KEY, JSON.stringify(session));
+    const versionedSession = createVersionedImportSession(session, session.savedAt);
+    storage.setItem(STORAGE_KEY, JSON.stringify(versionedSession));
   } catch {
     // Storage quota exceeded or unavailable — fail silently
   }
 }
 
-export function loadLatestImportSession(): ImportSession | null {
+export function loadLatestVersionedImportSession(): VersionedImportSession | null {
   const storage = getStorage();
   if (!storage) return null;
   try {
     const raw = storage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed: unknown = JSON.parse(raw);
-    if (
-      typeof parsed !== "object" ||
-      parsed === null ||
-      (parsed as { version?: unknown }).version !== 1
-    ) {
-      return null;
-    }
-    return parsed as ImportSession;
+    return migrateImportSession(parsed);
   } catch {
     return null;
   }
+}
+
+export function loadLatestImportSession(): ImportSession | null {
+  return loadLatestVersionedImportSession()?.payload ?? null;
 }
 
 export function clearLatestImportSession(): void {
