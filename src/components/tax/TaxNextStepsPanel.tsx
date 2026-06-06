@@ -50,26 +50,33 @@ export function TaxNextStepsPanel({ estimate }: TaxNextStepsPanelProps) {
     setChecked((current) => current.map((value, i) => (i === index ? !value : value)));
   };
 
-  const { totals, fiatCurrency, taxYear } = summary;
+  const { totals, taxYear, byCurrency } = summary;
 
   const accountantText = useMemo(() => {
+    const resultLines =
+      byCurrency.length > 0
+        ? byCurrency.map(
+            (c) =>
+              `Предварительный налоговый результат (${c.fiatCurrency}): ${formatMoney(
+                c.preliminaryTaxableResultFiat,
+                c.fiatCurrency,
+              )}`,
+          )
+        : ["Предварительный налоговый результат: нет включённых операций"];
+
     return [
       "Предварительная налоговая оценка (для проверки с бухгалтером)",
       `Год: ${taxYear ?? "—"}`,
-      `Валюта: ${fiatCurrency}`,
       `Включено операций: ${totals.includedOperations}`,
       `Исключено: ${totals.excludedOperations}`,
       `Требует проверки: ${totals.needsReviewOperations}`,
       `Не поддерживается: ${totals.unsupportedOperations}`,
-      `Предварительный налоговый результат: ${formatMoney(
-        totals.preliminaryTaxableResultFiat,
-        fiatCurrency,
-      )}`,
+      ...resultLines,
       "",
       METHODOLOGY_NOTE,
       NEXT_STEPS_DISCLAIMER,
     ].join("\n");
-  }, [fiatCurrency, taxYear, totals]);
+  }, [byCurrency, taxYear, totals]);
 
   const handleCopy = async () => {
     if (typeof navigator === "undefined" || !navigator.clipboard) return;

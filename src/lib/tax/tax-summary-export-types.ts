@@ -1,6 +1,7 @@
 import type { TransactionType } from "@/lib/domain/types";
 import type { TaxEventClassificationCategory } from "@/lib/tax/tax-event-types";
 import type {
+  PreliminaryTaxEstimateCurrencyTotals,
   TaxEstimateOperationReasonCode,
   TaxEstimateOperationStatus,
 } from "@/lib/tax/manual-cost-basis-types";
@@ -49,6 +50,8 @@ export interface TaxSummaryExport {
   taxYear: number | null;
   fiatCurrency: string;
   totals: TaxSummaryExportTotals;
+  /** Per-currency totals for included operations; never mixes currencies. */
+  byCurrency: PreliminaryTaxEstimateCurrencyTotals[];
   included: TaxSummaryExportOperation[];
   excluded: TaxSummaryExportOperation[];
   needsReview: TaxSummaryExportOperation[];
