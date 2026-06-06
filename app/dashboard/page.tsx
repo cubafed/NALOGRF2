@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { Calculator } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { FooterDisclaimer } from "@/components/layout/FooterDisclaimer";
 import { AnalyticsDashboard } from "@/components/dashboard/AnalyticsDashboard";
@@ -21,6 +23,10 @@ export default function DashboardPage() {
               Денежный поток, полнота данных и активность по месяцам — по загруженным данным CSV.
               Значения рассчитаны только по локальным данным.
             </p>
+            <Link href="/tax" className="btn" style={{ gap: 8, marginTop: 16, fontSize: 13 }}>
+              <Calculator size={15} />
+              Предварительная налоговая оценка
+            </Link>
           </div>
           <AnalyticsDashboard />
         </div>
