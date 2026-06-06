@@ -40,12 +40,16 @@ It does not implement calculations.
 - No tax payment processing.
 - Official-channel instructions only.
 - Must not collect or process tax payments.
+- Implemented by TAX-GUIDE-1: "Следующие шаги" panel on `/tax` with checklist,
+  disclaimer, methodology note, and official-channel instructions only.
 
 ## TAX-5
 
 - Tax summary export for accountant/tax-consultant.
 - Client-side export only.
 - No backend filing.
+- Implemented by TAX-GUIDE-1: client-side `tax-summary.json` / `tax-summary.csv`
+  export via Blob (`build-tax-summary-export.ts`), plus copy-for-accountant.
 
 ## TAX-6
 
