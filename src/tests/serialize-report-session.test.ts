@@ -73,6 +73,7 @@ const report: ReportPreviewModel = {
   documentsNeeded: [],
   affectedRows: [],
   generatedQuestions: [],
+  documentChecklist: [],
   disclaimer: "Информационный отчет.",
 };
 
@@ -118,5 +119,21 @@ describe("serializeReportSession", () => {
     });
 
     expect(draft.partnerAttribution).toEqual(partnerAttribution);
+  });
+
+  it("does not include documentCollectionState when collectedDocumentKeys is omitted", () => {
+    const draft = serializeReportSession({ session, report });
+    expect(draft.documentCollectionState).toBeUndefined();
+  });
+
+  it("includes documentCollectionState when collectedDocumentKeys is provided", () => {
+    const draft = serializeReportSession({
+      session,
+      report,
+      collectedDocumentKeys: ["bank_statement", "sell_order"],
+    });
+    expect(draft.documentCollectionState).toEqual({
+      collectedKeys: ["bank_statement", "sell_order"],
+    });
   });
 });

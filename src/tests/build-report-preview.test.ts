@@ -109,5 +109,28 @@ describe("buildReportPreview", () => {
     expect(model.documentsNeeded).toEqual([]);
     expect(model.affectedRows).toEqual([]);
     expect(model.generatedQuestions).toEqual([]);
+    expect(model.documentChecklist).toEqual([]);
+  });
+
+  it("builds documentChecklist from findings", () => {
+    const model = buildReportPreview(
+      makeSession([
+        makeFinding({
+          id: "a",
+          documentsNeeded: ["bank statement", "price source"],
+        }),
+      ]),
+    );
+    expect(model.documentChecklist.length).toBeGreaterThan(0);
+    const keys = model.documentChecklist.map((i) => i.key);
+    expect(keys).toContain("bank_statement");
+    expect(keys).toContain("price_source");
+  });
+
+  it("documentChecklist is deterministic", () => {
+    const session = makeSession([makeFinding()]);
+    const a = buildReportPreview(session);
+    const b = buildReportPreview(session);
+    expect(a.documentChecklist).toEqual(b.documentChecklist);
   });
 });

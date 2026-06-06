@@ -1,22 +1,14 @@
 import type { RiskEngineResult } from "@/lib/risk/risk-types";
 import type { ParserSummary } from "@/lib/parsers/parser-types";
+import { AlertTriangle, AlertCircle, TrendingDown, FileText, Clock } from "lucide-react";
+import { ReadinessGauge } from "@/components/ui/ReadinessGauge";
+import { FindingsBreakdown } from "@/components/ui/FindingsBreakdown";
+import { StatCard } from "@/components/ui/StatCard";
 
 interface ProblemsSummaryProps {
   riskResult: RiskEngineResult;
   parserSummary: ParserSummary;
   savedAt: string;
-}
-
-function readinessLabelRu(label: string): string {
-  if (label === "good") return "Готов";
-  if (label === "needs_review") return "Требует проверки";
-  return "Высокий риск";
-}
-
-function readinessColor(label: string): string {
-  if (label === "good") return "var(--green)";
-  if (label === "needs_review") return "var(--amber)";
-  return "var(--red)";
 }
 
 export function ProblemsSummary({ riskResult, parserSummary, savedAt }: ProblemsSummaryProps) {
@@ -25,64 +17,88 @@ export function ProblemsSummary({ riskResult, parserSummary, savedAt }: Problems
   return (
     <section className="panel">
       <div className="panel-inner">
-        <div className="panel-head">
-          <div>
-            <p className="eyebrow">Готовность отчета</p>
-            <h2 style={{ margin: 0 }}>
-              <span style={{ color: readinessColor(readinessLabel) }}>
-                {readinessLabelRu(readinessLabel)}
-              </span>
-            </h2>
+        <p className="eyebrow">Анализ готовности</p>
+
+        <div
+          style={{
+            display: "flex",
+            gap: 32,
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+            marginTop: 16,
+          }}
+        >
+          {/* Gauge */}
+          <ReadinessGauge score={readinessScore} label={readinessLabel} size={180} />
+
+          {/* Stats */}
+          <div style={{ flex: 1, minWidth: 220 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))",
+                gap: 10,
+                marginBottom: 20,
+              }}
+            >
+              <StatCard
+                icon={<AlertTriangle size={16} color="var(--red)" />}
+                iconBg="var(--red-soft)"
+                value={summary.criticalCount}
+                label="Критичных"
+                valueColor={summary.criticalCount > 0 ? "var(--red)" : undefined}
+              />
+              <StatCard
+                icon={<AlertCircle size={16} color="var(--amber)" />}
+                iconBg="var(--amber-soft)"
+                value={summary.mediumCount}
+                label="Средних"
+                valueColor={summary.mediumCount > 0 ? "var(--amber)" : undefined}
+              />
+              <StatCard
+                icon={<TrendingDown size={16} color="var(--blue)" />}
+                iconBg="var(--blue-soft)"
+                value={summary.affectedTransactionCount}
+                label="Строк затронуто"
+              />
+              <StatCard
+                icon={<FileText size={16} color="var(--muted)" />}
+                iconBg="rgba(255,255,255,0.06)"
+                value={parserSummary.transactionCount}
+                label="Транзакций всего"
+              />
+            </div>
+
+            {/* Breakdown chart */}
+            {summary.totalFindings > 0 && (
+              <div>
+                <p className="eyebrow" style={{ marginBottom: 10 }}>Breakdown по severity</p>
+                <FindingsBreakdown summary={summary} />
+              </div>
+            )}
           </div>
-          <span className="badge" style={{ fontSize: "22px", padding: "8px 18px" }}>
-            {readinessScore}
-            <span style={{ fontSize: "13px", opacity: 0.6 }}>/100</span>
-          </span>
         </div>
 
-        <div className="metric-grid">
-          <div className="metric">
-            <span>Всего проблем</span>
-            <strong>{summary.totalFindings}</strong>
-          </div>
-          <div className="metric">
-            <span>Критичные</span>
-            <strong style={{ color: summary.criticalCount > 0 ? "var(--red)" : undefined }}>
-              {summary.criticalCount}
-            </strong>
-          </div>
-          <div className="metric">
-            <span>Средние</span>
-            <strong style={{ color: summary.mediumCount > 0 ? "var(--amber)" : undefined }}>
-              {summary.mediumCount}
-            </strong>
-          </div>
-          <div className="metric">
-            <span>Низкие</span>
-            <strong>{summary.lowCount}</strong>
-          </div>
-          <div className="metric">
-            <span>Затронуто транзакций</span>
-            <strong>{summary.affectedTransactionCount}</strong>
-          </div>
-          <div className="metric">
-            <span>Ошибки парсера</span>
-            <strong style={{ color: parserSummary.errorCount > 0 ? "var(--red)" : undefined }}>
-              {parserSummary.errorCount}
-            </strong>
-          </div>
-          <div className="metric">
-            <span>Предупреждения парсера</span>
-            <strong style={{ color: parserSummary.warningCount > 0 ? "var(--amber)" : undefined }}>
-              {parserSummary.warningCount}
-            </strong>
-          </div>
-          <div className="metric">
-            <span>Данные загружены</span>
-            <strong style={{ fontSize: "12px" }}>
-              {new Date(savedAt).toLocaleString("ru-RU")}
-            </strong>
-          </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            marginTop: 16,
+            paddingTop: 12,
+            borderTop: "1px solid var(--line)",
+          }}
+        >
+          <Clock size={12} color="var(--muted)" />
+          <span style={{ fontSize: 12, color: "var(--muted)" }}>
+            Загружено: {new Date(savedAt).toLocaleString("ru-RU")}
+          </span>
+          {(parserSummary.errorCount > 0 || parserSummary.warningCount > 0) && (
+            <span style={{ fontSize: 12, color: "var(--amber)", marginLeft: 8 }}>
+              · {parserSummary.errorCount > 0 && `${parserSummary.errorCount} ошибок`}
+              {parserSummary.warningCount > 0 && ` ${parserSummary.warningCount} предупреждений`} парсера
+            </span>
+          )}
         </div>
       </div>
     </section>

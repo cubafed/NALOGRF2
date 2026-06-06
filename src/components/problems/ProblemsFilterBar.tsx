@@ -1,3 +1,6 @@
+"use client";
+
+import { Search } from "lucide-react";
 import type { FindingSeverity } from "@/lib/domain/types";
 
 export type SeverityFilter = FindingSeverity | "all";
@@ -10,11 +13,11 @@ interface ProblemsFilterBarProps {
   onSearch: (v: string) => void;
 }
 
-const FILTERS: { value: SeverityFilter; label: string }[] = [
+const FILTERS: { value: SeverityFilter; label: string; color?: string }[] = [
   { value: "all", label: "Все" },
-  { value: "critical", label: "Критичные" },
-  { value: "medium", label: "Средние" },
-  { value: "low", label: "Низкие" },
+  { value: "critical", label: "Критичные", color: "var(--red)" },
+  { value: "medium", label: "Средние", color: "var(--amber)" },
+  { value: "low", label: "Низкие", color: "var(--blue)" },
 ];
 
 export function ProblemsFilterBar({
@@ -29,41 +32,41 @@ export function ProblemsFilterBar({
       style={{
         display: "flex",
         flexWrap: "wrap",
-        gap: "10px",
+        gap: 8,
         alignItems: "center",
-        marginBottom: "16px",
+        marginBottom: 16,
       }}
     >
-      {FILTERS.map((f) => (
-        <button
-          key={f.value}
-          type="button"
-          onClick={() => onFilter(f.value)}
-          className={`btn ${active === f.value ? "btn-primary" : "btn-secondary"}`}
-          style={{ fontSize: "13px", padding: "6px 14px" }}
-        >
-          {f.label}{" "}
-          <span style={{ opacity: 0.65 }}>
-            ({counts[f.value]})
-          </span>
-        </button>
-      ))}
-      <input
-        type="search"
-        placeholder="Поиск по тексту..."
-        value={search}
-        onChange={(e) => onSearch(e.target.value)}
-        style={{
-          background: "var(--panel-2)",
-          border: "1px solid var(--line)",
-          borderRadius: "6px",
-          color: "var(--ink)",
-          fontSize: "13px",
-          padding: "6px 12px",
-          minWidth: "180px",
-        }}
-        aria-label="Поиск по проблемам"
-      />
+      <div className="filter-pills">
+        {FILTERS.map((f) => (
+          <button
+            key={f.value}
+            type="button"
+            onClick={() => onFilter(f.value)}
+            className={`filter-pill${active === f.value ? " filter-pill--active" : ""}`}
+            style={
+              active === f.value && f.color
+                ? { borderColor: f.color, color: f.color, background: `${f.color}14` }
+                : undefined
+            }
+          >
+            {f.label}
+            <span className="filter-pill-count">{counts[f.value]}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="search-input-wrap" style={{ marginLeft: "auto" }}>
+        <Search size={13} className="search-input-icon" />
+        <input
+          type="search"
+          placeholder="Поиск..."
+          value={search}
+          onChange={(e) => onSearch(e.target.value)}
+          className="search-input"
+          aria-label="Поиск по проблемам"
+        />
+      </div>
     </div>
   );
 }

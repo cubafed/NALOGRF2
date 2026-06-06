@@ -1,5 +1,6 @@
 import type { ImportSession } from "@/lib/client/import-session-storage";
 import { deriveReportQuestions } from "./derive-report-questions";
+import { buildDocumentChecklist } from "./build-document-checklist";
 import type { ReportPreviewModel } from "./report-types";
 
 const REPORT_DISCLAIMER =
@@ -26,6 +27,7 @@ export function buildReportPreview(session: ImportSession): ReportPreviewModel {
   ).sort((a, b) => a - b);
 
   const generatedQuestions = deriveReportQuestions(findings);
+  const documentChecklist = buildDocumentChecklist(findings);
 
   return {
     fileName,
@@ -38,6 +40,7 @@ export function buildReportPreview(session: ImportSession): ReportPreviewModel {
     documentsNeeded,
     affectedRows,
     generatedQuestions,
+    documentChecklist,
     disclaimer: REPORT_DISCLAIMER,
   };
 }

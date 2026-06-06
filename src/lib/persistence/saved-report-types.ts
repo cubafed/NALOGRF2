@@ -16,6 +16,7 @@ export interface SavedReportDraft {
   reportPreview: ReportPreviewModel;
   partnerAttribution: PartnerAttribution | null;
   sourceType: SavedReportSourceType;
+  documentCollectionState?: { collectedKeys: string[] };
 }
 
 export interface SavedReportRecord extends SavedReportDraft {
@@ -40,4 +41,5 @@ export interface SerializeReportSessionInput {
   session: ImportSession;
   report: ReportPreviewModel;
   partnerAttribution?: PartnerAttribution | null;
+  collectedDocumentKeys?: string[];
 }

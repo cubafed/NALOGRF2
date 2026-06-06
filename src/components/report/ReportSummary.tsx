@@ -1,4 +1,8 @@
 import type { ReadinessLabel, RiskSummary } from "@/lib/risk/risk-types";
+import { AlertTriangle, AlertCircle, TrendingDown } from "lucide-react";
+import { ReadinessGauge } from "@/components/ui/ReadinessGauge";
+import { FindingsBreakdown } from "@/components/ui/FindingsBreakdown";
+import { StatCard } from "@/components/ui/StatCard";
 
 interface ReportSummaryProps {
   readinessScore: number;
@@ -6,65 +10,60 @@ interface ReportSummaryProps {
   riskSummary: RiskSummary;
 }
 
-function readinessLabelRu(label: ReadinessLabel): string {
-  if (label === "good") return "Готов";
-  if (label === "needs_review") return "Требует проверки";
-  return "Высокий риск";
-}
-
-function readinessColor(label: ReadinessLabel): string {
-  if (label === "good") return "var(--green)";
-  if (label === "needs_review") return "var(--amber)";
-  return "var(--red)";
-}
-
-export function ReportSummary({
-  readinessScore,
-  readinessLabel,
-  riskSummary,
-}: ReportSummaryProps) {
+export function ReportSummary({ readinessScore, readinessLabel, riskSummary }: ReportSummaryProps) {
   return (
     <section className="panel">
       <div className="panel-inner">
-        <div className="panel-head">
-          <div>
-            <p className="eyebrow">Готовность отчета</p>
-            <h2 style={{ margin: 0 }}>
-              <span style={{ color: readinessColor(readinessLabel) }}>
-                {readinessLabelRu(readinessLabel)}
-              </span>
-            </h2>
-          </div>
-          <span className="badge" style={{ fontSize: "22px", padding: "8px 18px" }}>
-            {readinessScore}
-            <span style={{ fontSize: "13px", opacity: 0.6 }}>/100</span>
-          </span>
-        </div>
+        <p className="eyebrow">Готовность отчета</p>
 
-        <div className="metric-grid">
-          <div className="metric">
-            <span>Всего проблем</span>
-            <strong>{riskSummary.totalFindings}</strong>
-          </div>
-          <div className="metric">
-            <span>Критичные</span>
-            <strong style={{ color: riskSummary.criticalCount > 0 ? "var(--red)" : undefined }}>
-              {riskSummary.criticalCount}
-            </strong>
-          </div>
-          <div className="metric">
-            <span>Средние</span>
-            <strong style={{ color: riskSummary.mediumCount > 0 ? "var(--amber)" : undefined }}>
-              {riskSummary.mediumCount}
-            </strong>
-          </div>
-          <div className="metric">
-            <span>Низкие</span>
-            <strong>{riskSummary.lowCount}</strong>
-          </div>
-          <div className="metric">
-            <span>Затронуто транзакций</span>
-            <strong>{riskSummary.affectedTransactionCount}</strong>
+        <div
+          style={{
+            display: "flex",
+            gap: 32,
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+            marginTop: 16,
+          }}
+        >
+          <ReadinessGauge score={readinessScore} label={readinessLabel} size={180} />
+
+          <div style={{ flex: 1, minWidth: 220 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+                gap: 10,
+                marginBottom: 20,
+              }}
+            >
+              <StatCard
+                icon={<AlertTriangle size={16} color="var(--red)" />}
+                iconBg="var(--red-soft)"
+                value={riskSummary.criticalCount}
+                label="Критичных"
+                valueColor={riskSummary.criticalCount > 0 ? "var(--red)" : undefined}
+              />
+              <StatCard
+                icon={<AlertCircle size={16} color="var(--amber)" />}
+                iconBg="var(--amber-soft)"
+                value={riskSummary.mediumCount}
+                label="Средних"
+                valueColor={riskSummary.mediumCount > 0 ? "var(--amber)" : undefined}
+              />
+              <StatCard
+                icon={<TrendingDown size={16} color="var(--blue)" />}
+                iconBg="var(--blue-soft)"
+                value={riskSummary.affectedTransactionCount}
+                label="Строк затронуто"
+              />
+            </div>
+
+            {riskSummary.totalFindings > 0 && (
+              <div>
+                <p className="eyebrow" style={{ marginBottom: 10 }}>Breakdown по severity</p>
+                <FindingsBreakdown summary={riskSummary} />
+              </div>
+            )}
           </div>
         </div>
       </div>

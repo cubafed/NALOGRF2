@@ -1,5 +1,6 @@
 import type { ParserSummary } from "@/lib/parsers/parser-types";
 import type { ReadinessLabel, RiskFinding, RiskSummary } from "@/lib/risk/risk-types";
+import type { DocumentChecklistItem } from "./document-checklist-types";
 
 export interface ReportQuestion {
   id: string;
@@ -22,5 +23,6 @@ export interface ReportPreviewModel {
   documentsNeeded: string[];
   affectedRows: number[];
   generatedQuestions: ReportQuestion[];
+  documentChecklist: DocumentChecklistItem[];
   disclaimer: string;
 }

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
+import { FileText, Lock, Info } from "lucide-react";
 import {
   loadLatestImportSession,
   clearLatestImportSession,
@@ -29,11 +31,11 @@ export function ProblemsDashboard() {
 
   if (session === "loading") {
     return (
-      <section className="panel">
-        <div className="panel-inner">
-          <p className="muted">Загрузка...</p>
-        </div>
-      </section>
+      <div className="upload-stack">
+        <div className="skeleton" style={{ height: 80, borderRadius: "var(--radius-md)" }} />
+        <div className="skeleton" style={{ height: 200, borderRadius: "var(--radius-md)" }} />
+        <div className="skeleton" style={{ height: 400, borderRadius: "var(--radius-md)" }} />
+      </div>
     );
   }
 
@@ -65,16 +67,24 @@ export function ProblemsDashboard() {
   });
 
   return (
-    <div className="upload-stack">
+    <motion.div
+      className="upload-stack"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+    >
       {/* Header info */}
       <div className="row-between">
-        <div>
-          <p className="eyebrow">Локальный сеанс</p>
-          <h2 style={{ margin: 0 }}>{fileName ?? "Без имени файла"}</h2>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <FileText size={20} color="var(--blue)" />
+          <div>
+            <p className="eyebrow">Локальный сеанс</p>
+            <h2 style={{ margin: 0 }}>{fileName ?? "Без имени файла"}</h2>
+          </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <Link href="/report" className="btn btn-primary" style={{ fontSize: "13px" }}>
-            Сформировать предпросмотр отчета
+            Сформировать отчет
           </Link>
           <button
             type="button"
@@ -82,22 +92,22 @@ export function ProblemsDashboard() {
             style={{ fontSize: "12px", opacity: 0.7 }}
             onClick={handleClear}
           >
-            Очистить локальные данные
+            Очистить данные
           </button>
         </div>
       </div>
 
       {/* Privacy and disclaimer notes */}
       <section className="panel">
-        <div className="panel-inner">
-          <p className="muted" style={{ margin: "0 0 6px", fontSize: "13px" }}>
-            🔒 Данные загружены из локального браузерного сеанса. В этом MVP они не сохраняются на
-            сервере.
-          </p>
-          <p className="muted" style={{ margin: 0, fontSize: "13px" }}>
-            ℹ️ Информационный отчет. Не является налоговой, юридической, финансовой или
-            AML-консультацией.
-          </p>
+        <div className="panel-inner" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--muted)" }}>
+            <Lock size={12} color="var(--green)" style={{ flexShrink: 0 }} />
+            Данные обрабатываются локально в браузере и не передаются на сервер.
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--muted)" }}>
+            <Info size={12} style={{ flexShrink: 0 }} />
+            Информационный отчет. Не является налоговой, юридической, финансовой или AML-консультацией.
+          </div>
         </div>
       </section>
 
@@ -162,9 +172,16 @@ export function ProblemsDashboard() {
                   Нет проблем по выбранному фильтру.
                 </p>
               ) : (
-                <div className="review-findings-grid">
-                  {filtered.map((f) => (
-                    <ProblemFindingCard key={f.id} finding={f} />
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {filtered.map((f, i) => (
+                    <motion.div
+                      key={f.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.04, duration: 0.25 }}
+                    >
+                      <ProblemFindingCard finding={f} />
+                    </motion.div>
                   ))}
                 </div>
               )}
@@ -172,6 +189,6 @@ export function ProblemsDashboard() {
           )}
         </div>
       </section>
-    </div>
+    </motion.div>
   );
 }
