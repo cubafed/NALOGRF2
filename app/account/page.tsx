@@ -1,8 +1,10 @@
 import { AuthStatus } from "@/components/auth/AuthStatus";
 import { SignInPanel } from "@/components/auth/SignInPanel";
-import { FooterDisclaimer } from "@/components/layout/FooterDisclaimer";
-import { Header } from "@/components/layout/Header";
 import { SupabaseUnavailableNotice } from "@/components/persistence/SupabaseUnavailableNotice";
+import { AppShell } from "@/components/ui/AppShell";
+import { DataPanel } from "@/components/ui/DataPanel";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 export const metadata = {
@@ -14,43 +16,23 @@ export default function AccountPage() {
   const configured = isSupabaseConfigured();
 
   return (
-    <>
-      <Header />
-      <main>
-        <section className="section">
-          <div className="container">
-            <div className="section-head">
-              <p className="eyebrow">Account</p>
-              <h1 style={{ margin: 0, fontSize: "clamp(38px, 5vw, 68px)", lineHeight: 1 }}>
-                Аккаунт
-              </h1>
-              <p className="lead" style={{ marginTop: "14px" }}>
-                Supabase auth foundation для будущего облачного сохранения. Локальный MVP
-                продолжает работать без аккаунта.
-              </p>
-            </div>
-
-            <div className="upload-stack">
-              <section className="panel">
-                <div className="panel-inner">
-                  <div className="panel-head">
-                    <div>
-                      <p className="eyebrow">Supabase state</p>
-                      <h2 style={{ margin: 0 }}>
-                        {configured ? "Supabase настроен" : "Supabase не настроен"}
-                      </h2>
-                    </div>
-                    <AuthStatus />
-                  </div>
-                  {!configured && <SupabaseUnavailableNotice />}
-                </div>
-              </section>
-              {configured && <SignInPanel />}
-            </div>
-          </div>
-        </section>
-      </main>
-      <FooterDisclaimer />
-    </>
+    <AppShell>
+      <PageHeader
+        eyebrow="Аккаунт"
+        status={<StatusBadge status={configured ? "active" : "not_configured"} />}
+        subtitle="Аккаунт нужен только для явного облачного сохранения. Локальный импорт, проблемы и предпросмотр отчета работают без входа."
+        title="Аккаунт и облачное сохранение"
+      />
+      <div className="upload-stack">
+        <DataPanel
+          actions={<AuthStatus />}
+          eyebrow="Состояние"
+          title={configured ? "Облачное сохранение настроено" : "Облачное сохранение не настроено"}
+        >
+          {!configured && <SupabaseUnavailableNotice />}
+        </DataPanel>
+        {configured && <SignInPanel />}
+      </div>
+    </AppShell>
   );
 }

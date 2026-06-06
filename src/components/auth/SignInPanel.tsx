@@ -4,6 +4,9 @@ import { FormEvent, useEffect, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { getSupabaseBrowserConfig } from "@/lib/supabase/config";
 import { SupabaseUnavailableNotice } from "@/components/persistence/SupabaseUnavailableNotice";
+import { DataPanel } from "@/components/ui/DataPanel";
+import { NoticeCard } from "@/components/ui/NoticeCard";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 type SignInState =
   | { status: "loading" }
@@ -117,16 +120,12 @@ export function SignInPanel() {
   };
 
   return (
-    <section className="panel">
-      <div className="panel-inner">
-        <div className="panel-head">
-          <div>
-            <p className="eyebrow">Auth foundation</p>
-            <h2 style={{ margin: 0 }}>Вход по email</h2>
-          </div>
-          <span className="badge">Optional</span>
-        </div>
-
+    <DataPanel
+      actions={<StatusBadge status={signInState.status === "signed_in" ? "active" : "draft"} />}
+      description="Вход нужен только для будущего облачного сохранения. Импорт, проблемы и отчет доступны без аккаунта."
+      eyebrow="Аккаунт"
+      title="Вход по email"
+    >
         {signInState.status === "loading" && (
           <p className="muted">Проверка текущего входа...</p>
         )}
@@ -160,17 +159,16 @@ export function SignInPanel() {
               />
             </label>
             <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-              {isSubmitting ? "Отправка..." : "Получить magic link"}
+              {isSubmitting ? "Отправка..." : "Получить ссылку для входа"}
             </button>
           </form>
         )}
 
-        <p className="muted" style={{ marginBottom: 0 }}>
-          Вход нужен только для будущего облачного сохранения. `/upload`, `/problems`
-          и `/report` остаются доступными без аккаунта.
-        </p>
-        {message && <p className="muted">{message}</p>}
-      </div>
-    </section>
+        {message && (
+          <NoticeCard compact variant={message.includes("ошиб") ? "danger" : "info"}>
+            <p className="muted">{message}</p>
+          </NoticeCard>
+        )}
+    </DataPanel>
   );
 }

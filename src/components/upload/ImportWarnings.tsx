@@ -1,16 +1,14 @@
 import type { ParserWarning } from "@/lib/parsers/parser-types";
+import { DataPanel } from "@/components/ui/DataPanel";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export function ImportWarnings({ warnings }: { warnings: ParserWarning[] }) {
   return (
-    <section className="panel">
-      <div className="panel-inner">
-        <div className="panel-head">
-          <div>
-            <p className="eyebrow">Warnings</p>
-            <h2 style={{ margin: 0 }}>Предупреждения parser</h2>
-          </div>
-          <span className="badge">{warnings.length}</span>
-        </div>
+    <DataPanel
+      actions={<StatusBadge label={String(warnings.length)} status={warnings.length > 0 ? "needs_review" : "ready"} />}
+      eyebrow="Импорт"
+      title="Предупреждения импорта"
+    >
         {warnings.length === 0 ? (
           <p className="muted" style={{ marginTop: "16px" }}>
             Предупреждений нет.
@@ -20,10 +18,10 @@ export function ImportWarnings({ warnings }: { warnings: ParserWarning[] }) {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Code</th>
-                  <th>Row</th>
-                  <th>Field</th>
-                  <th>Message</th>
+                  <th>Код</th>
+                  <th>Строка</th>
+                  <th>Поле</th>
+                  <th>Сообщение</th>
                 </tr>
               </thead>
               <tbody>
@@ -39,7 +37,6 @@ export function ImportWarnings({ warnings }: { warnings: ParserWarning[] }) {
             </table>
           </div>
         )}
-      </div>
-    </section>
+    </DataPanel>
   );
 }

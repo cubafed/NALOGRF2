@@ -3,10 +3,14 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AuthStatus } from "@/components/auth/AuthStatus";
-import { Header } from "@/components/layout/Header";
-import { FooterDisclaimer } from "@/components/layout/FooterDisclaimer";
 import { SavedReportsList } from "@/components/persistence/SavedReportsList";
 import { SupabaseUnavailableNotice } from "@/components/persistence/SupabaseUnavailableNotice";
+import { ActionLink } from "@/components/ui/ActionLink";
+import { AppShell } from "@/components/ui/AppShell";
+import { DataPanel } from "@/components/ui/DataPanel";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { createSupabaseSavedReportService } from "@/lib/persistence/saved-report-service.supabase";
 import type { SavedReportRecord } from "@/lib/persistence/saved-report-types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -64,56 +68,32 @@ export default function SavedReportsPage() {
   }, []);
 
   return (
-    <>
-      <Header />
-      <main>
-        <section className="section">
-          <div className="container">
-            <div className="section-head">
-              <p className="eyebrow">Saved reports</p>
-              <h1 style={{ margin: 0, fontSize: "clamp(38px, 5vw, 68px)", lineHeight: 1 }}>
-                Сохраненные отчеты
-              </h1>
-              <p className="lead" style={{ marginTop: "14px" }}>
-                Основа для будущего облачного сохранения. Локальный MVP продолжает
-                работать без Supabase.
-              </p>
-            </div>
+    <AppShell>
+      <PageHeader
+        eyebrow="Сохраненные"
+        status={<StatusBadge status={state.status === "ready" ? "active" : state.status === "unconfigured" ? "not_configured" : "loading"} />}
+        subtitle="Список отчетов, сохраненных только после явного действия пользователя. Локальный MVP продолжает работать без облачного сохранения."
+        title="Сохраненные отчеты"
+      />
 
-            <section className="panel">
-              <div className="panel-inner">
-                <div className="panel-head">
-                  <div>
-                    <p className="eyebrow">Cloud persistence</p>
-                    <h2 style={{ margin: 0 }}>Статус сохраненных отчетов</h2>
-                  </div>
-                  <AuthStatus />
-                </div>
+      <DataPanel actions={<AuthStatus />} eyebrow="Cloud persistence" title="Статус сохраненных отчетов">
+        {state.status === "unconfigured" && <SupabaseUnavailableNotice />}
 
-                {state.status === "unconfigured" && <SupabaseUnavailableNotice />}
+        {state.status === "loading" && (
+          <p className="muted">Проверка аккаунта и доступных отчетов...</p>
+        )}
 
-                {state.status === "loading" && (
-                  <p className="muted">Проверка аккаунта и доступных отчетов...</p>
-                )}
+        {state.status === "signed_out" && (
+          <EmptyState
+            description="Войдите в аккаунт, чтобы открыть облачные сохранения. Локальный импорт и предпросмотр отчета доступны без входа."
+            primaryAction={<ActionLink href="/account" variant="primary">Открыть аккаунт</ActionLink>}
+            secondaryAction={<ActionLink href="/upload" variant="ghost">Перейти к импорту</ActionLink>}
+            title="Вход не выполнен"
+          />
+        )}
 
-                {state.status === "signed_out" && (
-                  <div>
-                    <p className="muted">
-                      Войдите в аккаунт, чтобы использовать облачное сохранение.
-                    </p>
-                    <Link href="/account" className="btn btn-primary">
-                      Открыть аккаунт
-                    </Link>
-                  </div>
-                )}
-
-                {state.status === "ready" && <SavedReportsList reports={state.reports} />}
-              </div>
-            </section>
-          </div>
-        </section>
-      </main>
-      <FooterDisclaimer />
-    </>
+        {state.status === "ready" && <SavedReportsList reports={state.reports} />}
+      </DataPanel>
+    </AppShell>
   );
 }

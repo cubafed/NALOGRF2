@@ -25,7 +25,7 @@ export function ReportFileDeleteButton({
     setIsDeleting(false);
 
     if (!result.ok) {
-      onError(result.error ?? "Не удалось удалить PDF attachment.");
+      onError(result.error ?? "Не удалось удалить PDF-файл.");
       return;
     }
 

@@ -1,4 +1,8 @@
 import Link from "next/link";
+import { ActionLink } from "@/components/ui/ActionLink";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { formatDateShort } from "@/lib/ui/formatters";
 import type { SavedReportRecord } from "@/lib/persistence/saved-report-types";
 
 interface SavedReportsListProps {
@@ -8,10 +12,12 @@ interface SavedReportsListProps {
 export function SavedReportsList({ reports }: SavedReportsListProps) {
   if (reports.length === 0) {
     return (
-      <p className="muted">
-        Сохраненных отчетов пока нет. Сохранение выполняется только после явного
-        действия пользователя на `/report`.
-      </p>
+      <EmptyState
+        description="Сохраненных отчетов пока нет. Сохранение выполняется только после явного действия пользователя на странице отчета."
+        primaryAction={<ActionLink href="/upload" variant="primary">Перейти к импорту</ActionLink>}
+        secondaryAction={<ActionLink href="/report" variant="ghost">Открыть отчет</ActionLink>}
+        title="Пока нет сохраненных отчетов"
+      />
     );
   }
 
@@ -24,10 +30,10 @@ export function SavedReportsList({ reports }: SavedReportsListProps) {
             <strong>{report.title}</strong>
             <small>{report.fileName ?? "Без имени файла"}</small>
           </span>
-          <span>{report.readinessLabel}</span>
+          <StatusBadge status={report.readinessLabel === "good" ? "ready" : report.readinessLabel === "needs_review" ? "needs_review" : "error"} />
           <span>{report.sourceType}</span>
           <time dateTime={report.createdAt}>
-            {new Date(report.createdAt).toLocaleString("ru-RU")}
+            {formatDateShort(report.createdAt)}
           </time>
         </Link>
       ))}

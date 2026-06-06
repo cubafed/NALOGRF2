@@ -1,21 +1,13 @@
-import Link from "next/link";
+import { ActionLink } from "@/components/ui/ActionLink";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export function ProblemsEmptyState() {
   return (
-    <section className="panel">
-      <div className="panel-inner empty-import-state">
-        <p className="eyebrow">Нет данных</p>
-        <h2>Пока нет данных для problems dashboard</h2>
-        <p className="muted">
-          Загрузите CSV на странице импорта или используйте sample CSV, чтобы увидеть список
-          проблем.
-        </p>
-        <div className="actions" style={{ marginTop: "24px" }}>
-          <Link href="/upload" className="btn btn-primary">
-            Перейти к загрузке CSV
-          </Link>
-        </div>
-      </div>
-    </section>
+    <EmptyState
+      eyebrow="Нет данных"
+      description="Загрузите CSV или используйте sample CSV, чтобы продолжить и увидеть список проблем для проверки."
+      primaryAction={<ActionLink href="/upload" variant="primary">Перейти к импорту</ActionLink>}
+      title="Пока нет данных для проверки"
+    />
   );
 }

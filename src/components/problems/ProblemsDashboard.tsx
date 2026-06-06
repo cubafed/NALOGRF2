@@ -12,6 +12,11 @@ import { ProblemsSummary } from "./ProblemsSummary";
 import { ProblemsFilterBar, type SeverityFilter } from "./ProblemsFilterBar";
 import { ProblemFindingCard } from "./ProblemFindingCard";
 import { ProblemsEmptyState } from "./ProblemsEmptyState";
+import { ActionLink } from "@/components/ui/ActionLink";
+import { DataPanel } from "@/components/ui/DataPanel";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { NoticeCard } from "@/components/ui/NoticeCard";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export function ProblemsDashboard() {
   const [session, setSession] = useState<ImportSession | null | "loading">("loading");
@@ -74,7 +79,10 @@ export function ProblemsDashboard() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <Link href="/report" className="btn btn-primary" style={{ fontSize: "13px" }}>
-            Сформировать предпросмотр отчета
+            Сформировать отчет
+          </Link>
+          <Link href="/upload" className="btn btn-secondary" style={{ fontSize: "13px" }}>
+            Вернуться к импорту
           </Link>
           <button
             type="button"
@@ -82,24 +90,19 @@ export function ProblemsDashboard() {
             style={{ fontSize: "12px", opacity: 0.7 }}
             onClick={handleClear}
           >
-            Очистить локальные данные
+            Очистить локальный сеанс
           </button>
         </div>
       </div>
 
       {/* Privacy and disclaimer notes */}
-      <section className="panel">
-        <div className="panel-inner">
-          <p className="muted" style={{ margin: "0 0 6px", fontSize: "13px" }}>
-            🔒 Данные загружены из локального браузерного сеанса. В этом MVP они не сохраняются на
-            сервере.
-          </p>
-          <p className="muted" style={{ margin: 0, fontSize: "13px" }}>
-            ℹ️ Информационный отчет. Не является налоговой, юридической, финансовой или
-            AML-консультацией.
-          </p>
-        </div>
-      </section>
+      <NoticeCard title="Локальный режим" variant="info">
+        <p className="muted">
+          Данные обрабатываются локально в браузере, пока вы явно не сохраните отчет.
+          Информационный отчет не является налоговой, юридической, финансовой или
+          AML-консультацией.
+        </p>
+      </NoticeCard>
 
       {/* Summary cards */}
       <ProblemsSummary
@@ -110,17 +113,15 @@ export function ProblemsDashboard() {
 
       {/* Parser issues note */}
       {(parserErrors.length > 0 || parserWarnings.length > 0) && (
-        <section className="panel">
-          <div className="panel-inner">
-            <p className="eyebrow">Технические замечания импорта</p>
+        <DataPanel eyebrow="Импорт" title="Технические замечания">
             {parserErrors.length > 0 && (
               <p style={{ margin: "0 0 4px", fontSize: "13px", color: "var(--red)" }}>
-                {parserErrors.length} ошибок парсера — некоторые строки могли быть пропущены.
+                {parserErrors.length} ошибок импорта — некоторые строки могли быть пропущены.
               </p>
             )}
             {parserWarnings.length > 0 && (
               <p style={{ margin: 0, fontSize: "13px", color: "var(--amber)" }}>
-                {parserWarnings.length} предупреждений парсера.
+                {parserWarnings.length} предупреждений импорта.
               </p>
             )}
             <p className="muted" style={{ marginTop: "8px", fontSize: "12px" }}>
@@ -130,23 +131,22 @@ export function ProblemsDashboard() {
               </a>
               .
             </p>
-          </div>
-        </section>
+        </DataPanel>
       )}
 
       {/* Findings section */}
-      <section className="panel">
-        <div className="panel-inner">
-          <p className="eyebrow">Список проблем</p>
-          <h2 style={{ margin: "0 0 16px" }}>
-            Проблемы для проверки
-          </h2>
+      <DataPanel
+        actions={<StatusBadge label={`${findings.length} найдено`} status={findings.length > 0 ? "needs_review" : "ready"} />}
+        eyebrow="Список проблем"
+        title="Проблемы для проверки"
+      >
 
           {findings.length === 0 ? (
-            <p className="muted">
-              Проблемы для проверки не найдены. Это не является налоговой, юридической,
-              финансовой или AML-консультацией.
-            </p>
+            <EmptyState
+              description="Проблемы для проверки не найдены. Это не является налоговой, юридической, финансовой или AML-консультацией."
+              primaryAction={<ActionLink href="/report" variant="primary">Открыть отчет</ActionLink>}
+              title="Проблемы не найдены"
+            />
           ) : (
             <>
               <ProblemsFilterBar
@@ -170,8 +170,7 @@ export function ProblemsDashboard() {
               )}
             </>
           )}
-        </div>
-      </section>
+      </DataPanel>
     </div>
   );
 }

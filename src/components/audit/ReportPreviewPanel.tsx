@@ -2,11 +2,11 @@ import type { DemoReport } from "@/lib/domain/types";
 
 export function ReportPreviewPanel({ report }: { report: DemoReport }) {
   const rows = [
-    ["Missing cost basis", report.metrics.missingCostBasis],
-    ["P2P inflows", report.metrics.p2pInflows],
-    ["Large fiat withdrawals", report.metrics.largeFiatWithdrawals],
-    ["Unmatched transfers", report.metrics.unmatchedTransfers],
-    ["Unknown source wallets", report.metrics.unknownSourceWallets],
+    ["Нет истории приобретения", report.metrics.missingCostBasis],
+    ["P2P-поступления", report.metrics.p2pInflows],
+    ["Крупные фиатные выводы", report.metrics.largeFiatWithdrawals],
+    ["Несопоставленные переводы", report.metrics.unmatchedTransfers],
+    ["Неизвестные кошельки-источники", report.metrics.unknownSourceWallets],
   ];
 
   return (
@@ -29,11 +29,11 @@ export function ReportPreviewPanel({ report }: { report: DemoReport }) {
             <strong>{report.period.label}</strong>
           </div>
           <div className="metric">
-            <span>Readiness</span>
+            <span>Готовность</span>
             <strong>{report.readinessScore}/100</strong>
           </div>
           <div className="metric">
-            <span>Risk score</span>
+            <span>Оценка риска</span>
             <strong>{report.riskScore}/100</strong>
           </div>
         </div>
@@ -42,7 +42,7 @@ export function ReportPreviewPanel({ report }: { report: DemoReport }) {
             <div className="report-row" key={label}>
               <strong>{value}</strong>
               <span>{label}</span>
-              <span className="muted">needs review</span>
+              <span className="muted">требует проверки</span>
             </div>
           ))}
         </div>

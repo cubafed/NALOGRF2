@@ -19,18 +19,18 @@ export default function PartnersPage() {
       <Header />
       <main>
         <PartnerHero
-          eyebrow="Partners"
+          eyebrow="Партнерам"
           title="Партнерская программа для бирж, бухгалтеров и крипто-сообществ"
           subtitle="Помогайте пользователям подготовить криптоисторию для банка, бухгалтера или налогового консультанта — без хранения файлов на сервере в текущем MVP."
           ctaHref="/upload?partner=demo-partner&utm_source=partner-page&utm_campaign=mvp-demo"
-          ctaLabel="Открыть demo upload"
+          ctaLabel="Открыть демо-импорт"
         />
         <PartnerUseCases partners={demoPartners} />
         <PartnerFlow />
         <PartnerValueCards />
         <PartnerCTA
           href="/upload?partner=demo-partner&utm_source=partner-page&utm_campaign=mvp-demo"
-          label="Открыть demo upload с partner tag"
+          label="Открыть демо-импорт с partner tag"
         />
       </main>
       <FooterDisclaimer />

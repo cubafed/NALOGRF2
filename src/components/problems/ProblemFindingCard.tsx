@@ -4,27 +4,16 @@ import { useState } from "react";
 import type { RiskFinding } from "@/lib/risk/risk-types";
 import { DocumentsNeededList } from "./DocumentsNeededList";
 import { AffectedRowsList } from "./AffectedRowsList";
+import { SeverityBadge } from "@/components/ui/SeverityBadge";
 
 interface ProblemFindingCardProps {
   finding: RiskFinding;
 }
 
-const SEVERITY_COLORS: Record<string, string> = {
-  critical: "var(--red)",
-  medium: "var(--amber)",
-  low: "var(--muted)",
-};
-
-const SEVERITY_LABELS: Record<string, string> = {
-  critical: "Критично",
-  medium: "Средне",
-  low: "Низко",
-};
-
 function buildChecklist(finding: RiskFinding): string {
   const lines: string[] = [
     `Проблема: ${finding.title}`,
-    `Rule ID: ${finding.ruleId}`,
+    `ruleId: ${finding.ruleId}`,
     `Серьёзность: ${finding.severity}`,
     ``,
     `Описание: ${finding.explanation}`,
@@ -46,13 +35,25 @@ function buildChecklist(finding: RiskFinding): string {
 export function ProblemFindingCard({ finding }: ProblemFindingCardProps) {
   const [reviewed, setReviewed] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
 
-  const handleCopyChecklist = () => {
+  const handleCopyChecklist = async () => {
     const text = buildChecklist(finding);
-    navigator.clipboard?.writeText(text).then(() => {
+
+    try {
+      if (!navigator.clipboard) {
+        throw new Error("Clipboard API unavailable");
+      }
+
+      await navigator.clipboard.writeText(text);
       setCopied(true);
+      setCopyError(false);
       setTimeout(() => setCopied(false), 2000);
-    });
+    } catch {
+      setCopied(false);
+      setCopyError(true);
+      setTimeout(() => setCopyError(false), 3000);
+    }
   };
 
   return (
@@ -62,14 +63,9 @@ export function ProblemFindingCard({ finding }: ProblemFindingCardProps) {
     >
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span
-            className={`severity severity-${finding.severity}`}
-            style={{ color: SEVERITY_COLORS[finding.severity] }}
-          >
-            {SEVERITY_LABELS[finding.severity] ?? finding.severity}
-          </span>
+          <SeverityBadge severity={finding.severity} />
           <span className="muted" style={{ fontSize: "11px" }}>
-            {finding.ruleId}
+            ruleId: {finding.ruleId}
           </span>
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
@@ -79,7 +75,7 @@ export function ProblemFindingCard({ finding }: ProblemFindingCardProps) {
             style={{ fontSize: "11px", padding: "4px 10px" }}
             onClick={handleCopyChecklist}
           >
-            {copied ? "Скопировано" : "Скопировать checklist"}
+            {copied ? "Скопировано" : copyError ? "Нет доступа к буферу" : "Скопировать чеклист"}
           </button>
           <button
             type="button"
@@ -91,9 +87,9 @@ export function ProblemFindingCard({ finding }: ProblemFindingCardProps) {
               cursor: "default",
             }}
             onClick={() => setReviewed((v) => !v)}
-            aria-label="Отметить как reviewed (локально)"
+            aria-label="Отметить как проверенное локально"
           >
-            {reviewed ? "Снять отметку" : "Отметить как reviewed"}
+            {reviewed ? "Снять отметку" : "Отметить как проверенное"}
           </button>
         </div>
       </div>

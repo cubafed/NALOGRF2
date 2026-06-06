@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { MetricCard } from "@/components/ui/MetricCard";
+import { NoticeCard } from "@/components/ui/NoticeCard";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 interface PartnerHeroProps {
   eyebrow: string;
@@ -28,7 +31,7 @@ export function PartnerHero({
                 {ctaLabel}
               </Link>
               <Link href="/upload" className="btn btn-secondary">
-                Открыть upload
+                Открыть импорт
               </Link>
             </div>
           </div>
@@ -39,22 +42,18 @@ export function PartnerHero({
                   <p className="eyebrow">MVP tracking skeleton</p>
                   <h2 style={{ margin: 0 }}>Локальное сохранение partner tag</h2>
                 </div>
-                <span className="badge">Browser-only</span>
+                <StatusBadge status="local" />
               </div>
               <div className="metric-grid">
-                <div className="metric">
-                  <span>Partner tag</span>
-                  <strong>local</strong>
-                </div>
-                <div className="metric">
-                  <span>Server storage</span>
-                  <strong>none</strong>
-                </div>
+                <MetricCard label="Partner tag" value="локально" />
+                <MetricCard label="Серверное хранение" value="нет" />
               </div>
-              <p className="muted" style={{ marginBottom: 0, marginTop: "16px" }}>
-                В текущем MVP referral metadata сохраняется только в браузере пользователя и не
-                отправляется на сервер.
-              </p>
+              <NoticeCard compact variant="info">
+                <p className="muted">
+                  Partner attribution хранится только локально в браузере и не отправляется
+                  на сервер в текущем MVP.
+                </p>
+              </NoticeCard>
             </div>
           </div>
         </div>

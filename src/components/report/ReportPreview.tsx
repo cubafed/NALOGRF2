@@ -17,6 +17,7 @@ import { ReportDisclaimer } from "./ReportDisclaimer";
 import { ReportEmptyState } from "./ReportEmptyState";
 import { ReportPrintActions } from "./ReportPrintActions";
 import { SaveReportPanel } from "@/components/persistence/SaveReportPanel";
+import { ActionLink } from "@/components/ui/ActionLink";
 
 export function ReportPreview() {
   const [session, setSession] = useState<ImportSession | null | "loading">("loading");
@@ -48,13 +49,9 @@ export function ReportPreview() {
           <p className="eyebrow">Навигация</p>
           <h2 style={{ margin: 0 }}>Структурированный предпросмотр</h2>
         </div>
-        <Link
-          href="/problems"
-          className="btn"
-          style={{ fontSize: "12px", opacity: 0.8 }}
-        >
-          Назад к проблемам
-        </Link>
+        <ActionLink href="/problems" variant="ghost">
+          Вернуться к проблемам
+        </ActionLink>
       </div>
 
       <ReportPrintActions report={model} />

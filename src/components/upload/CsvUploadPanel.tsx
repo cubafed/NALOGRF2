@@ -17,6 +17,12 @@ import { ImportWarnings } from "@/components/upload/ImportWarnings";
 import { RawRowsPreview } from "@/components/upload/RawRowsPreview";
 import { TransactionPreviewTable } from "@/components/upload/TransactionPreviewTable";
 import { PartnerAttributionPreview } from "@/components/partners/PartnerAttributionPreview";
+import { DataPanel } from "@/components/ui/DataPanel";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { MetricCard } from "@/components/ui/MetricCard";
+import { NoticeCard } from "@/components/ui/NoticeCard";
+import { SeverityBadge } from "@/components/ui/SeverityBadge";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 const expectedColumns = [
   "date",
@@ -117,15 +123,12 @@ export function CsvUploadPanel() {
     <div className="upload-stack">
       <PartnerAttributionPreview />
 
-      <section className="panel">
-        <div className="panel-inner">
-          <div className="panel-head">
-            <div>
-              <p className="eyebrow">Local CSV import</p>
-              <h2 style={{ margin: 0 }}>Universal CSV</h2>
-            </div>
-            <span className="badge">Browser-only</span>
-          </div>
+      <DataPanel
+        actions={<StatusBadge status="local" />}
+        description="Данные обрабатываются локально в браузере, пока вы явно не сохраните отчет."
+        eyebrow="Локальный импорт"
+        title="Universal CSV"
+      >
 
           <div className="upload-grid">
             <div className="upload-box">
@@ -139,7 +142,7 @@ export function CsvUploadPanel() {
               />
               <p className="upload-title">Выберите `.csv` файл</p>
               <p className="muted">
-                Accepted format: `.csv`. Max file size for this MVP: {maxFileSizeMb} MB.
+                Формат: `.csv`. Максимальный размер для MVP: {maxFileSizeMb} MB.
               </p>
               <div className="actions" style={{ marginTop: "18px" }}>
                 <button
@@ -151,54 +154,55 @@ export function CsvUploadPanel() {
                   {isReading ? "Чтение файла..." : "Выбрать файл"}
                 </button>
                 <button type="button" className="btn btn-secondary" onClick={handleSample}>
-                  Use sample CSV
+                  Использовать sample CSV
                 </button>
                 <button type="button" className="btn" onClick={handleClear}>
-                  Clear
+                  Очистить
                 </button>
               </div>
             </div>
 
             <div className="card">
-              <span className="card-number">Expected columns</span>
+              <span className="card-number">Ожидаемые колонки</span>
               <p style={{ marginTop: "10px", overflowWrap: "anywhere" }}>{expectedColumnText}</p>
-              <p className="muted" style={{ marginTop: "14px" }}>
-                В этом MVP файл читается локально в браузере. Мы не сохраняем файл и не
-                отправляем данные на сервер.
-              </p>
-              <p className="muted" style={{ marginTop: "10px" }}>
-                Информационный отчет. Не является налоговой, юридической, финансовой или
-                AML-консультацией.
-              </p>
+              <NoticeCard compact title="Локальный режим" variant="info">
+                <p className="muted">
+                  Raw CSV не загружается автоматически. Мы не имеем доступа к вашим средствам.
+                </p>
+              </NoticeCard>
             </div>
           </div>
 
           {uiError && <p className="error-text">{uiError}</p>}
-        </div>
-      </section>
+      </DataPanel>
 
       {!uploadState && !uiError && (
-        <section className="panel">
-          <div className="panel-inner empty-import-state">
-            <p className="eyebrow">Empty state</p>
-            <h2>Файл еще не выбран</h2>
-            <p className="muted">
-              Загрузите Universal CSV или нажмите “Use sample CSV”, чтобы увидеть import preview.
-            </p>
-          </div>
-        </section>
+        <EmptyState
+          eyebrow="Нет файла"
+          description="Загрузите Universal CSV или нажмите “Использовать sample CSV”, чтобы увидеть предпросмотр импорта."
+          title="Файл еще не выбран"
+        />
       )}
 
       {uploadState && (
         <>
           <div className="row-between">
             <div>
-              <p className="eyebrow">Selected file</p>
+              <p className="eyebrow">Выбранный файл</p>
               <h2 style={{ margin: 0 }}>{uploadState.fileName}</h2>
             </div>
-            <span className="badge">
-              {uploadState.result.summary.transactionCount} parsed transactions
-            </span>
+            <div className="actions" style={{ marginTop: 0 }}>
+              <StatusBadge
+                label={`${uploadState.result.summary.transactionCount} операций распознано`}
+                status="ready"
+              />
+              <Link href="/problems" className="btn btn-primary" style={{ fontSize: "13px" }}>
+                Посмотреть проблемы
+              </Link>
+              <Link href="/report" className="btn btn-secondary" style={{ fontSize: "13px" }}>
+                Открыть отчет
+              </Link>
+            </div>
           </div>
           <ImportSummary summary={uploadState.result.summary} />
           {riskResult && <ReviewFindingsPanel result={riskResult} />}
@@ -222,33 +226,24 @@ function ReviewFindingsPanel({ result }: { result: RiskEngineResult }) {
             <h2 style={{ margin: 0 }}>Пробелы по источнику средств и проблемы для проверки</h2>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <span className="badge">{formatReadinessLabel(result.readinessLabel)}</span>
+            <StatusBadge label={formatReadinessLabel(result.readinessLabel)} status={result.readinessLabel === "good" ? "ready" : result.readinessLabel === "needs_review" ? "needs_review" : "error"} />
             <Link href="/problems" className="btn btn-primary" style={{ fontSize: "13px" }}>
               Посмотреть проблемы
+            </Link>
+            <Link href="/report" className="btn btn-secondary" style={{ fontSize: "13px" }}>
+              Открыть отчет
             </Link>
           </div>
         </div>
 
         <div className="metric-grid">
-          <div className="metric">
-            <span>Readiness score</span>
-            <strong>{result.readinessScore}/100</strong>
-          </div>
-          <div className="metric">
-            <span>Total findings</span>
-            <strong>{result.summary.totalFindings}</strong>
-          </div>
-          <div className="metric">
-            <span>Critical / medium / low</span>
-            <strong>
-              {result.summary.criticalCount} / {result.summary.mediumCount} /{" "}
-              {result.summary.lowCount}
-            </strong>
-          </div>
-          <div className="metric">
-            <span>Affected transactions</span>
-            <strong>{result.summary.affectedTransactionCount}</strong>
-          </div>
+          <MetricCard label="Готовность отчета" value={`${result.readinessScore}/100`} />
+          <MetricCard label="Всего проблем" value={result.summary.totalFindings} />
+          <MetricCard
+            label="Критичные / средние / низкие"
+            value={`${result.summary.criticalCount} / ${result.summary.mediumCount} / ${result.summary.lowCount}`}
+          />
+          <MetricCard label="Затронуто транзакций" value={result.summary.affectedTransactionCount} />
         </div>
 
         {result.findings.length === 0 ? (
@@ -271,25 +266,25 @@ function ReviewFindingsPanel({ result }: { result: RiskEngineResult }) {
 function ReviewFindingCard({ finding }: { finding: RiskFinding }) {
   return (
     <article className="finding">
-      <span className={`severity severity-${finding.severity}`}>{finding.severity}</span>
+      <SeverityBadge severity={finding.severity} />
       <div>
         <h3 style={{ margin: "0 0 6px" }}>{finding.title}</h3>
         <p className="muted" style={{ margin: 0 }}>
-          Rule ID: <strong>{finding.ruleId}</strong>
+          ruleId: <strong>{finding.ruleId}</strong>
         </p>
       </div>
       <p style={{ margin: 0 }}>{finding.explanation}</p>
       <p className="muted" style={{ margin: 0 }}>
-        <strong>Why it matters:</strong> {finding.whyItMatters}
+        <strong>Почему важно:</strong> {finding.whyItMatters}
       </p>
       <p className="muted" style={{ margin: 0 }}>
-        <strong>Recommended action:</strong> {finding.recommendedAction}
+        <strong>Что сделать:</strong> {finding.recommendedAction}
       </p>
       <p className="muted" style={{ margin: 0 }}>
-        <strong>Documents:</strong> {finding.documentsNeeded.join(", ")}
+        <strong>Документы:</strong> {finding.documentsNeeded.join(", ")}
       </p>
       <p className="muted" style={{ margin: 0 }}>
-        <strong>Affected raw rows:</strong>{" "}
+        <strong>Строки CSV:</strong>{" "}
         {finding.affectedRawRowNumbers.length > 0
           ? finding.affectedRawRowNumbers.join(", ")
           : "—"}
@@ -299,7 +294,7 @@ function ReviewFindingCard({ finding }: { finding: RiskFinding }) {
 }
 
 function formatReadinessLabel(label: ReadinessLabel): string {
-  if (label === "good") return "Good";
-  if (label === "needs_review") return "Needs review";
-  return "High risk";
+  if (label === "good") return "Готово";
+  if (label === "needs_review") return "Требует проверки";
+  return "Высокий риск";
 }

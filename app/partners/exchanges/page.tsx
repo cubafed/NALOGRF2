@@ -19,15 +19,15 @@ export default function ExchangePartnersPage() {
         <PartnerHero
           eyebrow="Exchange partners"
           title="Для криптобирж и P2P-сообществ"
-          subtitle="Пользователям часто нужно подготовить transaction history для bank, accountant или tax review. Партнер может направить их в локальный upload/export flow."
+          subtitle="Пользователям часто нужно подготовить историю операций для банка, бухгалтера или налогового консультанта. Партнер может направить их в локальный импорт и предпросмотр отчета."
           ctaHref="/upload?partner=demo-exchange&utm_source=exchange-page&utm_campaign=mvp-demo"
-          ctaLabel="Открыть demo upload с partner tag"
+          ctaLabel="Открыть демо-импорт с partner tag"
         />
         <PartnerValueCards variant="exchanges" />
         <PartnerFlow />
         <PartnerCTA
           href="/upload?partner=demo-exchange&utm_source=exchange-page&utm_campaign=mvp-demo"
-          label="Открыть demo upload с partner tag"
+          label="Открыть демо-импорт с partner tag"
         />
       </main>
       <FooterDisclaimer />

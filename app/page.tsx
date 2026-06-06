@@ -18,8 +18,8 @@ export default function HomePage() {
           <div className="container">
             <div className="row-between" style={{ marginBottom: "24px" }}>
               <div className="section-head" style={{ marginBottom: 0 }}>
-                <p className="eyebrow">Risk preview</p>
-                <h2>Проблемы должны быть actionable, а не просто technical warning</h2>
+                <p className="eyebrow">Проблемы для проверки</p>
+                <h2>Проблемы должны вести к понятному следующему действию</h2>
               </div>
               <Link href="/demo" className="btn btn-primary">
                 Открыть демо

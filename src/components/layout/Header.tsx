@@ -12,17 +12,15 @@ export function Header() {
           </span>
         </Link>
         <nav className="nav" aria-label="Основные разделы">
-          <Link href="/">Главная</Link>
-          <Link href="/demo">Демо-отчет</Link>
-          <Link href="/upload">Загрузить CSV</Link>
+          <Link href="/upload">Импорт</Link>
           <Link href="/problems">Проблемы</Link>
           <Link href="/report">Отчет</Link>
-          <Link href="/partners">Партнерам</Link>
           <Link href="/saved-reports">Сохраненные</Link>
+          <Link href="/partners">Партнерам</Link>
           <Link href="/account">Аккаунт</Link>
         </nav>
         <Link href="/upload" className="btn btn-primary">
-          Загрузить CSV
+          Импортировать CSV
         </Link>
       </div>
     </header>

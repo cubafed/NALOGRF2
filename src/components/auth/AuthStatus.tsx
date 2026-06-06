@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { getSupabaseBrowserConfig } from "@/lib/supabase/config";
 
@@ -59,16 +60,16 @@ export function AuthStatus() {
   }, []);
 
   if (authState.status === "unconfigured") {
-    return <span className="badge">Supabase не настроен</span>;
+    return <StatusBadge status="not_configured" />;
   }
 
   if (authState.status === "loading") {
-    return <span className="badge">Проверка аккаунта...</span>;
+    return <StatusBadge status="loading" />;
   }
 
   if (authState.status === "signed_out") {
-    return <span className="badge">Вход не выполнен</span>;
+    return <StatusBadge status="signed_out" />;
   }
 
-  return <span className="badge">Аккаунт: {authState.email ?? "без email"}</span>;
+  return <StatusBadge label={authState.email ?? "Аккаунт активен"} status="active" />;
 }

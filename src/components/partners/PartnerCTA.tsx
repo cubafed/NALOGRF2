@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NoticeCard } from "@/components/ui/NoticeCard";
 
 interface PartnerCTAProps {
   href: string;
@@ -13,17 +14,19 @@ export function PartnerCTA({ href, label }: PartnerCTAProps) {
           <div className="panel-inner">
             <div className="panel-head">
               <div>
-                <p className="eyebrow">Demo referral link</p>
+                <p className="eyebrow">Демо-ссылка партнера</p>
                 <h2 style={{ margin: 0 }}>Проверить локальное сохранение partner tag</h2>
               </div>
               <Link href={href} className="btn btn-primary">
                 {label}
               </Link>
             </div>
-            <p className="muted" style={{ marginBottom: 0 }}>
-              В этом MVP partner attribution хранится только локально в браузере и не
-              отправляется на сервер.
-            </p>
+            <NoticeCard compact variant="info">
+              <p className="muted">
+                Partner attribution хранится только локально в браузере и не отправляется
+                на сервер в текущем MVP.
+              </p>
+            </NoticeCard>
           </div>
         </div>
       </div>

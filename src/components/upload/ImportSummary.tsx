@@ -1,35 +1,30 @@
 import type { ParserSummary } from "@/lib/parsers/parser-types";
+import { DataPanel } from "@/components/ui/DataPanel";
+import { MetricCard } from "@/components/ui/MetricCard";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 const summaryItems: Array<[keyof ParserSummary, string]> = [
   ["totalRows", "Всего строк"],
-  ["parsedRows", "Строк parsed"],
-  ["warningRows", "Строк с warnings"],
-  ["errorRows", "Строк с errors"],
+  ["parsedRows", "Распознано строк"],
+  ["warningRows", "Строк с предупреждениями"],
+  ["errorRows", "Строк с ошибками"],
   ["transactionCount", "Транзакций"],
-  ["warningCount", "Warnings"],
-  ["errorCount", "Errors"],
+  ["warningCount", "Предупреждений"],
+  ["errorCount", "Ошибок"],
 ];
 
 export function ImportSummary({ summary }: { summary: ParserSummary }) {
   return (
-    <section className="panel" aria-label="Import summary">
-      <div className="panel-inner">
-        <div className="panel-head">
-          <div>
-            <p className="eyebrow">Import summary</p>
-            <h2 style={{ margin: 0 }}>Результат импорта</h2>
-          </div>
-          <span className="badge">Local parse</span>
-        </div>
+    <DataPanel
+      actions={<StatusBadge status="local" />}
+      eyebrow="Сводка импорта"
+      title="Результат импорта"
+    >
         <div className="metric-grid">
           {summaryItems.map(([key, label]) => (
-            <div className="metric" key={key}>
-              <span>{label}</span>
-              <strong>{summary[key]}</strong>
-            </div>
+            <MetricCard key={key} label={label} value={summary[key]} />
           ))}
         </div>
-      </div>
-    </section>
+    </DataPanel>
   );
 }

@@ -11,8 +11,13 @@
   --blue: #1a82ff;
   --blue-soft: rgba(26, 130, 255, 0.14);
   --green: #00c87a;
+  --green-soft: rgba(0, 200, 122, 0.12);
   --amber: #ffbd5a;
+  --amber-soft: rgba(255, 189, 90, 0.12);
   --red: #ff6b6b;
+  --red-soft: rgba(255, 107, 107, 0.12);
+  --radius: 8px;
+  --radius-panel: 10px;
 }
 
 * {
@@ -41,6 +46,13 @@ a {
   text-decoration: none;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
 button,
 input,
 select,
@@ -55,6 +67,19 @@ textarea {
 .container {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
+}
+
+.app-section {
+  padding: 56px 0 72px;
+}
+
+.app-section-compact {
+  padding-top: 38px;
+}
+
+.app-container {
+  display: grid;
+  gap: 24px;
 }
 
 .topbar {
@@ -100,11 +125,12 @@ textarea {
 
 .nav {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
   color: #c9d4de;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .nav a,
@@ -153,6 +179,91 @@ textarea {
 .btn-secondary {
   border-color: rgba(26, 130, 255, 0.45);
   background: rgba(26, 130, 255, 0.14);
+}
+
+.btn-danger {
+  border-color: rgba(255, 107, 107, 0.4);
+  background: rgba(255, 107, 107, 0.1);
+  color: #ffd3d3;
+}
+
+.btn.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+  transform: none;
+}
+
+.page-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+
+.page-header-copy {
+  display: grid;
+  gap: 10px;
+  max-width: 760px;
+}
+
+.page-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.page-title-row h1 {
+  margin: 0;
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 950;
+  line-height: 1;
+}
+
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.page-meta {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.12;
+}
+
+.section-header p {
+  margin: 8px 0 0;
+}
+
+.section-header-compact {
+  margin-bottom: 12px;
+}
+
+.section-header-compact h2 {
+  font-size: 19px;
+}
+
+.section-action {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .section {
@@ -224,7 +335,7 @@ textarea {
   position: relative;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-panel);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
 }
@@ -241,6 +352,10 @@ textarea {
   position: relative;
   z-index: 1;
   padding: 24px;
+}
+
+.panel-inner-compact {
+  padding: 18px;
 }
 
 .panel-head,
@@ -261,6 +376,51 @@ textarea {
   font-size: 12px;
   font-weight: 850;
   padding: 5px 10px;
+}
+
+.status-badge,
+.severity-badge {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.status-neutral {
+  background: rgba(255, 255, 255, 0.06);
+  color: #d8e0e8;
+}
+
+.status-info,
+.severity-low {
+  border-color: rgba(26, 130, 255, 0.28);
+  background: var(--blue-soft);
+  color: #b9dcff;
+}
+
+.status-success {
+  border-color: rgba(0, 200, 122, 0.3);
+  background: var(--green-soft);
+  color: #b8ffe3;
+}
+
+.status-warning,
+.severity-medium {
+  border-color: rgba(255, 189, 90, 0.32);
+  background: var(--amber-soft);
+  color: #ffd08a;
+}
+
+.status-danger,
+.severity-critical {
+  border-color: rgba(255, 107, 107, 0.32);
+  background: var(--red-soft);
+  color: #ffaaaa;
 }
 
 .score {
@@ -286,6 +446,115 @@ textarea {
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.22);
   padding: 14px;
+}
+
+.metric small,
+.metric em {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.metric-info {
+  border-color: rgba(26, 130, 255, 0.22);
+}
+
+.metric-success {
+  border-color: rgba(0, 200, 122, 0.24);
+}
+
+.metric-warning {
+  border-color: rgba(255, 189, 90, 0.24);
+}
+
+.metric-danger {
+  border-color: rgba(255, 107, 107, 0.24);
+}
+
+.notice-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 14px;
+}
+
+.notice-card strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.notice-card p {
+  margin: 0;
+}
+
+.notice-info {
+  border-color: rgba(26, 130, 255, 0.24);
+  background: rgba(26, 130, 255, 0.08);
+}
+
+.notice-warning {
+  border-color: rgba(255, 189, 90, 0.26);
+  background: rgba(255, 189, 90, 0.08);
+}
+
+.notice-danger {
+  border-color: rgba(255, 107, 107, 0.28);
+  background: rgba(255, 107, 107, 0.08);
+}
+
+.notice-success {
+  border-color: rgba(0, 200, 122, 0.25);
+  background: rgba(0, 200, 122, 0.08);
+}
+
+.notice-compact {
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.empty-state {
+  min-height: 190px;
+  display: grid;
+  align-content: center;
+}
+
+.empty-state h2 {
+  margin: 0;
+}
+
+.empty-state-note {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.progress-wrap {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.progress-wrap > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.progress-track {
+  height: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(26, 130, 255, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.progress-track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--blue), var(--green));
 }
 
 .metric span {
@@ -649,7 +918,9 @@ code {
 @media (max-width: 900px) {
   .topbar-inner,
   .panel-head,
-  .row-between {
+  .row-between,
+  .page-header,
+  .section-header {
     align-items: flex-start;
     flex-direction: column;
   }
@@ -659,6 +930,11 @@ code {
   }
 
   .nav {
+    justify-content: flex-start;
+  }
+
+  .page-actions,
+  .section-action {
     justify-content: flex-start;
   }
 

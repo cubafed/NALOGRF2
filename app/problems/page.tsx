@@ -1,6 +1,7 @@
-import { Header } from "@/components/layout/Header";
-import { FooterDisclaimer } from "@/components/layout/FooterDisclaimer";
 import { ProblemsDashboard } from "@/components/problems/ProblemsDashboard";
+import { AppShell } from "@/components/ui/AppShell";
+import { ActionLink } from "@/components/ui/ActionLink";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export const metadata = {
   title: "Проблемы для проверки — Crypto Audit Report",
@@ -10,22 +11,15 @@ export const metadata = {
 
 export default function ProblemsPage() {
   return (
-    <>
-      <Header />
-      <main>
-        <div className="container" style={{ paddingTop: "48px", paddingBottom: "64px" }}>
-          <div style={{ marginBottom: "32px" }}>
-            <p className="eyebrow">Problems dashboard</p>
-            <h1 style={{ margin: "0 0 10px" }}>Проблемы для проверки</h1>
-            <p className="muted" style={{ maxWidth: "640px" }}>
-              Список операций и пробелов в данных, которые могут потребовать пояснения для банка,
-              бухгалтера или налогового консультанта.
-            </p>
-          </div>
-          <ProblemsDashboard />
-        </div>
-      </main>
-      <FooterDisclaimer />
-    </>
+    <AppShell>
+      <PageHeader
+        eyebrow="Проблемы"
+        primaryAction={<ActionLink href="/report" variant="primary">Сформировать отчет</ActionLink>}
+        secondaryActions={<ActionLink href="/upload" variant="ghost">Вернуться к импорту</ActionLink>}
+        subtitle="Список операций и пробелов в данных, которые могут потребовать пояснения для банка, бухгалтера или налогового консультанта."
+        title="Проблемы для проверки"
+      />
+      <ProblemsDashboard />
+    </AppShell>
   );
 }

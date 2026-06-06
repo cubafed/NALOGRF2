@@ -1,18 +1,16 @@
 import type { Transaction } from "@/lib/domain/types";
+import { DataPanel } from "@/components/ui/DataPanel";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export function TransactionPreviewTable({ transactions }: { transactions: Transaction[] }) {
   const preview = transactions.slice(0, 20);
 
   return (
-    <section className="panel">
-      <div className="panel-inner">
-        <div className="panel-head">
-          <div>
-            <p className="eyebrow">Transactions preview</p>
-            <h2 style={{ margin: 0 }}>Первые 20 parsed transactions</h2>
-          </div>
-          <span className="badge">{transactions.length}</span>
-        </div>
+    <DataPanel
+      actions={<StatusBadge label={String(transactions.length)} status="ready" />}
+      eyebrow="Операции"
+      title="Первые 20 распознанных операций"
+    >
         {preview.length === 0 ? (
           <p className="muted" style={{ marginTop: "16px" }}>
             Валидных транзакций пока нет.
@@ -22,14 +20,14 @@ export function TransactionPreviewTable({ transactions }: { transactions: Transa
             <table className="table">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Type</th>
-                  <th>Asset</th>
-                  <th>Amount</th>
-                  <th>Fiat value</th>
-                  <th>Fee</th>
-                  <th>Source</th>
-                  <th>Raw row</th>
+                  <th>Дата</th>
+                  <th>Тип</th>
+                  <th>Актив</th>
+                  <th>Количество</th>
+                  <th>Фиатная сумма</th>
+                  <th>Комиссия</th>
+                  <th>Источник</th>
+                  <th>Строка CSV</th>
                 </tr>
               </thead>
               <tbody>
@@ -49,8 +47,7 @@ export function TransactionPreviewTable({ transactions }: { transactions: Transa
             </table>
           </div>
         )}
-      </div>
-    </section>
+    </DataPanel>
   );
 }
 

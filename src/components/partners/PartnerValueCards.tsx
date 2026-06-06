@@ -5,11 +5,11 @@ interface PartnerValueCardsProps {
 const generalCards = [
   {
     title: "Что получают пользователи",
-    text: "Локальную загрузку Universal CSV, список missing data, review findings и report preview.",
+    text: "Локальную загрузку Universal CSV, список пробелов в данных, проблемы для проверки и предпросмотр отчета.",
   },
   {
     title: "Что получают партнеры",
-    text: "Простой MVP tracking skeleton для ссылок с partner tag без серверной аналитики.",
+    text: "Простой MVP-контур для ссылок с partner tag без серверной аналитики.",
   },
   {
     title: "Текущие ограничения",
@@ -24,26 +24,26 @@ const exchangeCards = [
   },
   {
     title: "Что есть сейчас",
-    text: "Партнер может вести пользователя в upload/export flow. MVP поддерживает Universal CSV.",
+    text: "Партнер может вести пользователя в локальный импорт и предпросмотр отчета. MVP поддерживает Universal CSV.",
   },
   {
     title: "Что позже",
-    text: "Future versions may support exchange-specific import formats, but not in this PR.",
+    text: "Будущие версии могут поддерживать форматы отдельных бирж, но не в этом PR.",
   },
 ];
 
 const accountantCards = [
   {
-    title: "Локальный CSV upload",
+    title: "Локальный CSV импорт",
     text: "Клиент может загрузить CSV локально в браузере. Файл не отправляется на сервер в текущем MVP.",
   },
   {
-    title: "Review findings",
-    text: "Приложение подсвечивает missing data и source-of-funds gaps, которые may require explanation.",
+    title: "Проблемы для проверки",
+    text: "Приложение подсвечивает пробелы в данных и source-of-funds gaps, которые могут потребовать пояснений.",
   },
   {
     title: "Вопросы к клиенту",
-    text: "Report preview помогает бухгалтеру или консультанту заранее собрать уточнения и документы.",
+    text: "Предпросмотр отчета помогает бухгалтеру или консультанту заранее собрать уточнения и документы.",
   },
 ];
 
@@ -59,7 +59,7 @@ export function PartnerValueCards({ variant = "general" }: PartnerValueCardsProp
     <section className="section">
       <div className="container">
         <div className="section-head">
-          <p className="eyebrow">Value</p>
+          <p className="eyebrow">Польза</p>
           <h2>Практическая польза MVP</h2>
         </div>
         <div className="grid-3">

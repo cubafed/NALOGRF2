@@ -1,22 +1,15 @@
 import type { RiskEngineResult } from "@/lib/risk/risk-types";
 import type { ParserSummary } from "@/lib/parsers/parser-types";
+import { MetricCard } from "@/components/ui/MetricCard";
+import { ProgressBar } from "@/components/ui/ProgressBar";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { formatDateShort } from "@/lib/ui/formatters";
+import { getReadinessStatus } from "@/lib/ui/status-labels";
 
 interface ProblemsSummaryProps {
   riskResult: RiskEngineResult;
   parserSummary: ParserSummary;
   savedAt: string;
-}
-
-function readinessLabelRu(label: string): string {
-  if (label === "good") return "Готов";
-  if (label === "needs_review") return "Требует проверки";
-  return "Высокий риск";
-}
-
-function readinessColor(label: string): string {
-  if (label === "good") return "var(--green)";
-  if (label === "needs_review") return "var(--amber)";
-  return "var(--red)";
 }
 
 export function ProblemsSummary({ riskResult, parserSummary, savedAt }: ProblemsSummaryProps) {
@@ -28,61 +21,21 @@ export function ProblemsSummary({ riskResult, parserSummary, savedAt }: Problems
         <div className="panel-head">
           <div>
             <p className="eyebrow">Готовность отчета</p>
-            <h2 style={{ margin: 0 }}>
-              <span style={{ color: readinessColor(readinessLabel) }}>
-                {readinessLabelRu(readinessLabel)}
-              </span>
-            </h2>
+            <h2 style={{ margin: 0 }}>Состояние локального импорта</h2>
           </div>
-          <span className="badge" style={{ fontSize: "22px", padding: "8px 18px" }}>
-            {readinessScore}
-            <span style={{ fontSize: "13px", opacity: 0.6 }}>/100</span>
-          </span>
+          <StatusBadge status={getReadinessStatus(readinessLabel)} />
         </div>
+        <ProgressBar label={`Готовность: ${readinessScore}/100`} value={readinessScore} />
 
         <div className="metric-grid">
-          <div className="metric">
-            <span>Всего проблем</span>
-            <strong>{summary.totalFindings}</strong>
-          </div>
-          <div className="metric">
-            <span>Критичные</span>
-            <strong style={{ color: summary.criticalCount > 0 ? "var(--red)" : undefined }}>
-              {summary.criticalCount}
-            </strong>
-          </div>
-          <div className="metric">
-            <span>Средние</span>
-            <strong style={{ color: summary.mediumCount > 0 ? "var(--amber)" : undefined }}>
-              {summary.mediumCount}
-            </strong>
-          </div>
-          <div className="metric">
-            <span>Низкие</span>
-            <strong>{summary.lowCount}</strong>
-          </div>
-          <div className="metric">
-            <span>Затронуто транзакций</span>
-            <strong>{summary.affectedTransactionCount}</strong>
-          </div>
-          <div className="metric">
-            <span>Ошибки парсера</span>
-            <strong style={{ color: parserSummary.errorCount > 0 ? "var(--red)" : undefined }}>
-              {parserSummary.errorCount}
-            </strong>
-          </div>
-          <div className="metric">
-            <span>Предупреждения парсера</span>
-            <strong style={{ color: parserSummary.warningCount > 0 ? "var(--amber)" : undefined }}>
-              {parserSummary.warningCount}
-            </strong>
-          </div>
-          <div className="metric">
-            <span>Данные загружены</span>
-            <strong style={{ fontSize: "12px" }}>
-              {new Date(savedAt).toLocaleString("ru-RU")}
-            </strong>
-          </div>
+          <MetricCard label="Всего проблем" value={summary.totalFindings} />
+          <MetricCard label="Критичные" value={summary.criticalCount} variant={summary.criticalCount > 0 ? "danger" : "neutral"} />
+          <MetricCard label="Средние" value={summary.mediumCount} variant={summary.mediumCount > 0 ? "warning" : "neutral"} />
+          <MetricCard label="Низкие" value={summary.lowCount} />
+          <MetricCard label="Затронуто транзакций" value={summary.affectedTransactionCount} />
+          <MetricCard label="Ошибки импорта" value={parserSummary.errorCount} variant={parserSummary.errorCount > 0 ? "danger" : "neutral"} />
+          <MetricCard label="Предупреждения импорта" value={parserSummary.warningCount} variant={parserSummary.warningCount > 0 ? "warning" : "neutral"} />
+          <MetricCard label="Данные загружены" value={formatDateShort(savedAt)} />
         </div>
       </div>
     </section>

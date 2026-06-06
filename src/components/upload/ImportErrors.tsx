@@ -1,16 +1,14 @@
 import type { ParserError } from "@/lib/parsers/parser-types";
+import { DataPanel } from "@/components/ui/DataPanel";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export function ImportErrors({ errors }: { errors: ParserError[] }) {
   return (
-    <section className="panel">
-      <div className="panel-inner">
-        <div className="panel-head">
-          <div>
-            <p className="eyebrow">Errors</p>
-            <h2 style={{ margin: 0 }}>Ошибки parser</h2>
-          </div>
-          <span className="badge">{errors.length}</span>
-        </div>
+    <DataPanel
+      actions={<StatusBadge label={String(errors.length)} status={errors.length > 0 ? "error" : "ready"} />}
+      eyebrow="Импорт"
+      title="Ошибки импорта"
+    >
         {errors.length === 0 ? (
           <p className="muted" style={{ marginTop: "16px" }}>
             Ошибок нет.
@@ -20,10 +18,10 @@ export function ImportErrors({ errors }: { errors: ParserError[] }) {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Code</th>
-                  <th>Row</th>
-                  <th>Field</th>
-                  <th>Message</th>
+                  <th>Код</th>
+                  <th>Строка</th>
+                  <th>Поле</th>
+                  <th>Сообщение</th>
                 </tr>
               </thead>
               <tbody>
@@ -39,7 +37,6 @@ export function ImportErrors({ errors }: { errors: ParserError[] }) {
             </table>
           </div>
         )}
-      </div>
-    </section>
+    </DataPanel>
   );
 }

@@ -1,16 +1,14 @@
 import type { RawCsvRow } from "@/lib/parsers/parser-types";
+import { DataPanel } from "@/components/ui/DataPanel";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export function RawRowsPreview({ rows }: { rows: RawCsvRow[] }) {
   return (
-    <section className="panel">
-      <div className="panel-inner">
-        <div className="panel-head">
-          <div>
-            <p className="eyebrow">Raw rows</p>
-            <h2 style={{ margin: 0 }}>Статус исходных строк</h2>
-          </div>
-          <span className="badge">{rows.length}</span>
-        </div>
+    <DataPanel
+      actions={<StatusBadge label={String(rows.length)} status="local" />}
+      eyebrow="Исходные строки"
+      title="Статус исходных строк"
+    >
         {rows.length === 0 ? (
           <p className="muted" style={{ marginTop: "16px" }}>
             Исходных строк нет.
@@ -20,9 +18,9 @@ export function RawRowsPreview({ rows }: { rows: RawCsvRow[] }) {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Row</th>
-                  <th>Status</th>
-                  <th>Raw summary</th>
+                  <th>Строка</th>
+                  <th>Статус</th>
+                  <th>Краткое описание</th>
                 </tr>
               </thead>
               <tbody>
@@ -37,8 +35,7 @@ export function RawRowsPreview({ rows }: { rows: RawCsvRow[] }) {
             </table>
           </div>
         )}
-      </div>
-    </section>
+    </DataPanel>
   );
 }
 

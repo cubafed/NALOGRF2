@@ -12,6 +12,9 @@ import { getSupabaseBrowserConfig } from "@/lib/supabase/config";
 import { SupabaseUnavailableNotice } from "@/components/persistence/SupabaseUnavailableNotice";
 import { SaveReportButton } from "@/components/persistence/SaveReportButton";
 import { SavedReportStatus } from "@/components/persistence/SavedReportStatus";
+import { DataPanel } from "@/components/ui/DataPanel";
+import { NoticeCard } from "@/components/ui/NoticeCard";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 interface SaveReportPanelProps {
   session: ImportSession;
@@ -63,50 +66,44 @@ export function SaveReportPanel({ session, report }: SaveReportPanelProps) {
 
   if (authState === "unconfigured") {
     return (
-      <section className="panel print-hidden">
-        <div className="panel-inner">
-          <div className="panel-head">
-            <div>
-              <p className="eyebrow">Сохранить отчет</p>
-              <h2 style={{ margin: 0 }}>Облачное сохранение</h2>
-            </div>
-            <span className="badge">Local MVP</span>
-          </div>
+      <DataPanel
+        actions={<StatusBadge status="local" />}
+        eyebrow="Сохранить отчет"
+        printHidden
+        title="Облачное сохранение"
+      >
           <SupabaseUnavailableNotice />
-        </div>
-      </section>
+      </DataPanel>
     );
   }
 
   if (authState === "loading") {
     return (
-      <section className="panel print-hidden">
-        <div className="panel-inner">
-          <p className="muted">Проверка состояния аккаунта...</p>
-        </div>
-      </section>
+      <DataPanel printHidden>
+        <p className="muted">Проверка состояния аккаунта...</p>
+      </DataPanel>
     );
   }
 
   if (authState === "signed_out") {
     return (
-      <section className="panel print-hidden">
-        <div className="panel-inner">
-          <div className="panel-head">
-            <div>
-              <p className="eyebrow">Сохранить отчет</p>
-              <h2 style={{ margin: 0 }}>Нужен вход в аккаунт</h2>
-            </div>
+      <DataPanel
+        actions={
             <Link href="/account" className="btn btn-primary">
               Открыть аккаунт
             </Link>
-          </div>
-          <p className="muted" style={{ marginBottom: 0 }}>
-            Облачное сохранение доступно только после входа. Локальный report preview
-            и печать PDF продолжают работать без аккаунта.
+        }
+        eyebrow="Сохранить отчет"
+        printHidden
+        title="Нужен вход в аккаунт"
+      >
+        <NoticeCard variant="info">
+          <p className="muted">
+            Облачное сохранение доступно только после входа. Локальный предпросмотр
+            отчета и печать PDF продолжают работать без аккаунта.
           </p>
-        </div>
-      </section>
+        </NoticeCard>
+      </DataPanel>
     );
   }
 
@@ -131,21 +128,17 @@ export function SaveReportPanel({ session, report }: SaveReportPanelProps) {
   };
 
   return (
-    <section className="panel print-hidden">
-      <div className="panel-inner">
-        <div className="panel-head">
-          <div>
-            <p className="eyebrow">Сохранить отчет</p>
-            <h2 style={{ margin: 0 }}>Облачное сохранение</h2>
-          </div>
-          <SaveReportButton isSaving={isSaving} onSave={handleSave} />
-        </div>
-        <p className="muted" style={{ marginBottom: 0 }}>
+    <DataPanel
+      actions={<SaveReportButton isSaving={isSaving} onSave={handleSave} />}
+      eyebrow="Сохранить отчет"
+      printHidden
+      title="Облачное сохранение"
+    >
+        <p className="muted">
           Данные сохраняются только после явного действия пользователя. Raw CSV не
           загружается автоматически.
         </p>
         <SavedReportStatus message={message?.text ?? null} tone={message?.tone} />
-      </div>
-    </section>
+    </DataPanel>
   );
 }

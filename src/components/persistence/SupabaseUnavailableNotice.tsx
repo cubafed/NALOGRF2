@@ -1,11 +1,12 @@
+import { NoticeCard } from "@/components/ui/NoticeCard";
+
 export function SupabaseUnavailableNotice() {
   return (
-    <div className="notice-box">
-      <strong>Облачное сохранение не настроено.</strong>
-      <p className="muted" style={{ marginBottom: 0 }}>
-        Сейчас отчет доступен только в локальном браузерном сеансе. Локальный MVP
-        продолжает работать без Supabase.
+    <NoticeCard title="Облачное сохранение не настроено." variant="warning">
+      <p className="muted">
+        Облачное сохранение не настроено. Локальный MVP продолжает работать. Данные
+        обрабатываются локально в браузере, пока вы явно не сохраните отчет.
       </p>
-    </div>
+    </NoticeCard>
   );
 }

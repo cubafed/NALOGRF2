@@ -3,6 +3,8 @@
 import type { ReportFileStorageService } from "@/lib/storage/report-file-types";
 import type { ReportFileRecord } from "@/lib/storage/report-file-types";
 import { ReportFileDeleteButton } from "@/components/storage/ReportFileDeleteButton";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { formatDateShort } from "@/lib/ui/formatters";
 
 interface ReportFilesListProps {
   files: ReportFileRecord[];
@@ -27,9 +29,10 @@ export function ReportFilesList({
 }: ReportFilesListProps) {
   if (files.length === 0) {
     return (
-      <p className="muted" style={{ marginBottom: 0 }}>
-        PDF attachments пока не прикреплены.
-      </p>
+      <EmptyState
+        description="PDF-файлы пока не прикреплены. Загрузка выполняется только после явного выбора файла."
+        title="Нет прикрепленных PDF"
+      />
     );
   }
 
@@ -41,11 +44,9 @@ export function ReportFilesList({
             <strong>{file.fileName}</strong>
             <small>{file.storagePath}</small>
           </span>
-          <span>{file.contentType ?? "unknown"}</span>
+          <span>{file.contentType ?? "Неизвестно"}</span>
           <span>{formatSize(file.sizeBytes)}</span>
-          <time dateTime={file.createdAt}>
-            {new Date(file.createdAt).toLocaleString("ru-RU")}
-          </time>
+          <time dateTime={file.createdAt}>{formatDateShort(file.createdAt)}</time>
           <ReportFileDeleteButton
             record={file}
             service={service}

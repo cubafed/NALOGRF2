@@ -10,6 +10,9 @@ import type { ReportFileStorageService } from "@/lib/storage/report-file-types";
 import { validateReportFile } from "@/lib/storage/validate-report-file";
 import { ReportFilesList } from "@/components/storage/ReportFilesList";
 import { StorageUnavailableNotice } from "@/components/storage/StorageUnavailableNotice";
+import { DataPanel } from "@/components/ui/DataPanel";
+import { NoticeCard } from "@/components/ui/NoticeCard";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 interface ReportFileUploadPanelProps {
   savedReportId: string;
@@ -113,12 +116,12 @@ export function ReportFileUploadPanel({ savedReportId }: ReportFileUploadPanelPr
 
     setFiles((currentFiles) => [result.record, ...currentFiles]);
     setSelectedFile(null);
-    setMessage({ text: "PDF attachment загружен и связан с отчетом.", tone: "success" });
+    setMessage({ text: "PDF-файл загружен и связан с отчетом.", tone: "success" });
   };
 
   const handleDeleted = (id: string) => {
     setFiles((currentFiles) => currentFiles.filter((file) => file.id !== id));
-    setMessage({ text: "PDF attachment удален.", tone: "success" });
+    setMessage({ text: "PDF-файл удален.", tone: "success" });
   };
 
   const handleError = (text: string) => {
@@ -126,15 +129,11 @@ export function ReportFileUploadPanel({ savedReportId }: ReportFileUploadPanelPr
   };
 
   return (
-    <section className="panel">
-      <div className="panel-inner">
-        <div className="panel-head">
-          <div>
-            <p className="eyebrow">Report files</p>
-            <h2 style={{ margin: 0 }}>Прикрепить PDF отчета</h2>
-          </div>
-          <span className="badge">Explicit upload only</span>
-        </div>
+    <DataPanel
+      actions={<StatusBadge label="Только вручную" status="draft" />}
+      eyebrow="Файлы отчета"
+      title="Прикрепить PDF отчета"
+    >
 
         {state.status === "unconfigured" && <StorageUnavailableNotice />}
 
@@ -157,14 +156,16 @@ export function ReportFileUploadPanel({ savedReportId }: ReportFileUploadPanelPr
           <div className="upload-stack" style={{ marginTop: "18px" }}>
             <div className="upload-box">
               <p className="upload-title">Выберите PDF файл</p>
-              <p className="muted">
-                Файл загружается только после явного выбора и подтверждения. Raw CSV не
-                загружается в этом PR.
-              </p>
+              <NoticeCard compact variant="warning">
+                <p className="muted">
+                  Файл загружается только после явного выбора и подтверждения. Raw CSV не
+                  загружается автоматически.
+                </p>
+              </NoticeCard>
               <input type="file" accept=".pdf,application/pdf" onChange={handleFileChange} />
               {selectedFile && (
                 <p className="muted">
-                  Selected: <strong>{selectedFile.name}</strong>
+                  Выбран файл: <strong>{selectedFile.name}</strong>
                 </p>
               )}
               {validation && !validation.ok && (
@@ -194,7 +195,6 @@ export function ReportFileUploadPanel({ savedReportId }: ReportFileUploadPanelPr
             />
           </div>
         )}
-      </div>
-    </section>
+    </DataPanel>
   );
 }

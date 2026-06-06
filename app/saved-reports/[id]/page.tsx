@@ -3,11 +3,14 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Header } from "@/components/layout/Header";
-import { FooterDisclaimer } from "@/components/layout/FooterDisclaimer";
 import { SavedReportDetail } from "@/components/persistence/SavedReportDetail";
 import { ReportFileUploadPanel } from "@/components/storage/ReportFileUploadPanel";
 import { SupabaseUnavailableNotice } from "@/components/persistence/SupabaseUnavailableNotice";
+import { ActionLink } from "@/components/ui/ActionLink";
+import { AppShell } from "@/components/ui/AppShell";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { createSupabaseSavedReportService } from "@/lib/persistence/saved-report-service.supabase";
 import type { SavedReportRecord } from "@/lib/persistence/saved-report-types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -69,60 +72,43 @@ export default function SavedReportDetailPage() {
   }, [params.id]);
 
   return (
-    <>
-      <Header />
-      <main>
-        <section className="section">
-          <div className="container">
-            <div className="section-head">
-              <p className="eyebrow">Saved report detail</p>
-              <h1 style={{ margin: 0, fontSize: "clamp(38px, 5vw, 68px)", lineHeight: 1 }}>
-                Сохраненный отчет
-              </h1>
-              <p className="lead" style={{ marginTop: "14px" }}>
-                Просмотр сохраненной записи из Supabase без повторных расчетов и без
-                загрузки raw CSV.
-              </p>
-            </div>
+    <AppShell>
+      <PageHeader
+        eyebrow="Сохраненный отчет"
+        status={<StatusBadge status={state.status === "ready" ? "saved" : state.status === "unconfigured" ? "not_configured" : state.status === "missing" ? "unavailable" : "loading"} />}
+        subtitle="Просмотр сохраненной записи без повторных расчетов и без автоматической загрузки raw CSV."
+        title="Сохраненный отчет"
+      />
 
-            {state.status === "unconfigured" && <SupabaseUnavailableNotice />}
-            {state.status === "loading" && (
-              <section className="panel">
-                <div className="panel-inner">
-                  <p className="muted">Загрузка сохраненного отчета...</p>
-                </div>
-              </section>
-            )}
-            {state.status === "signed_out" && (
-              <section className="panel">
-                <div className="panel-inner">
-                  <p className="muted">Войдите в аккаунт, чтобы открыть сохраненный отчет.</p>
-                  <Link href="/account" className="btn btn-primary">
-                    Открыть аккаунт
-                  </Link>
-                </div>
-              </section>
-            )}
-            {state.status === "missing" && (
-              <section className="panel">
-                <div className="panel-inner">
-                  <p className="muted">Отчет не найден или недоступен текущему пользователю.</p>
-                  <Link href="/saved-reports" className="btn btn-secondary">
-                    Назад к списку
-                  </Link>
-                </div>
-              </section>
-            )}
-            {state.status === "ready" && (
-              <>
-                <SavedReportDetail report={state.report} />
-                <ReportFileUploadPanel savedReportId={state.report.id} />
-              </>
-            )}
+      {state.status === "unconfigured" && <SupabaseUnavailableNotice />}
+      {state.status === "loading" && (
+        <section className="panel">
+          <div className="panel-inner">
+            <p className="muted">Загрузка сохраненного отчета...</p>
           </div>
         </section>
-      </main>
-      <FooterDisclaimer />
-    </>
+      )}
+      {state.status === "signed_out" && (
+        <EmptyState
+          description="Войдите в аккаунт, чтобы открыть сохраненный отчет. Локальный импорт и предпросмотр остаются доступны без входа."
+          primaryAction={<ActionLink href="/account" variant="primary">Открыть аккаунт</ActionLink>}
+          secondaryAction={<ActionLink href="/saved-reports" variant="ghost">Назад к списку</ActionLink>}
+          title="Вход не выполнен"
+        />
+      )}
+      {state.status === "missing" && (
+        <EmptyState
+          description="Отчет не найден или недоступен текущему пользователю."
+          primaryAction={<ActionLink href="/saved-reports" variant="secondary">Назад к списку</ActionLink>}
+          title="Отчет недоступен"
+        />
+      )}
+      {state.status === "ready" && (
+        <>
+          <SavedReportDetail report={state.report} />
+          <ReportFileUploadPanel savedReportId={state.report.id} />
+        </>
+      )}
+    </AppShell>
   );
 }

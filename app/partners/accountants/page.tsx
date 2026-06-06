@@ -19,15 +19,15 @@ export default function AccountantPartnersPage() {
         <PartnerHero
           eyebrow="Accountant partners"
           title="Для бухгалтеров и налоговых консультантов"
-          subtitle="Клиенты могут загрузить CSV локально, увидеть missing data и review findings, а report preview помогает заранее сформулировать вопросы к клиенту."
+          subtitle="Клиенты могут загрузить CSV локально, увидеть пробелы в данных и проблемы для проверки, а предпросмотр отчета помогает заранее сформулировать вопросы к клиенту."
           ctaHref="/upload?partner=demo-accountant&utm_source=accountant-page&utm_campaign=mvp-demo"
-          ctaLabel="Открыть demo upload с partner tag"
+          ctaLabel="Открыть демо-импорт с partner tag"
         />
         <PartnerValueCards variant="accountants" />
         <PartnerFlow />
         <PartnerCTA
           href="/upload?partner=demo-accountant&utm_source=accountant-page&utm_campaign=mvp-demo"
-          label="Открыть demo upload с partner tag"
+          label="Открыть демо-импорт с partner tag"
         />
       </main>
       <FooterDisclaimer />

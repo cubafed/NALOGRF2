@@ -4,12 +4,12 @@ const flowSteps = [
     text: "Ссылка может содержать partner, ref и UTM-параметры для будущей атрибуции.",
   },
   {
-    title: "Пользователь открывает upload",
+    title: "Пользователь открывает импорт",
     text: "MVP сохраняет partner attribution локально в браузере и показывает активный partner tag.",
   },
   {
     title: "CSV обрабатывается локально",
-    text: "Universal CSV parser, review findings и report preview работают без отправки файлов на сервер.",
+    text: "Universal CSV, проблемы для проверки и предпросмотр отчета работают без отправки файлов на сервер.",
   },
 ];
 
@@ -18,7 +18,7 @@ export function PartnerFlow() {
     <section className="section">
       <div className="container">
         <div className="section-head">
-          <p className="eyebrow">How referrals will work</p>
+          <p className="eyebrow">Партнерский поток</p>
           <h2>Как будет работать переход от партнера</h2>
         </div>
         <div className="partner-flow-list">

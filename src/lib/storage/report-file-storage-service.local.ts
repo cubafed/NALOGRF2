@@ -6,7 +6,7 @@ import type {
 } from "@/lib/storage/report-file-types";
 
 const unavailableMessage =
-  "Supabase Storage не настроен. PDF attachments доступны только после входа и настройки Supabase.";
+  "Supabase Storage не настроен. PDF-файлы доступны только после входа и настройки Supabase.";
 
 export class LocalReportFileStorageService implements ReportFileStorageService {
   async uploadReportFile(_input: ReportFileUploadInput): Promise<ReportFileUploadResult> {
