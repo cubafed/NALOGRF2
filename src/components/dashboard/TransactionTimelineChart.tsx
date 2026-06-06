@@ -1,16 +1,16 @@
-import type { TransactionActivityPoint } from "@/lib/metrics/analytics-types";
+import type { MonthlyTransactionCount } from "@/lib/analytics/analytics-types";
 
-interface TransactionActivityChartProps {
-  points: TransactionActivityPoint[];
+interface TransactionTimelineChartProps {
+  points: MonthlyTransactionCount[];
 }
 
-export function TransactionActivityChart({ points }: TransactionActivityChartProps) {
+export function TransactionTimelineChart({ points }: TransactionTimelineChartProps) {
   const max = Math.max(...points.map((point) => point.count), 1);
 
   return (
     <section className="panel">
       <div className="panel-inner">
-        <p className="eyebrow">Transaction activity</p>
+        <p className="eyebrow">Transaction timeline</p>
         <h2 style={{ margin: "0 0 16px" }}>Операции по месяцам</h2>
         {points.length === 0 ? (
           <p className="muted">Нет операций с корректной датой для построения timeline.</p>

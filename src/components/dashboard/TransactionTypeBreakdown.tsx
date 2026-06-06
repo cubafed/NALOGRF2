@@ -1,12 +1,12 @@
-import type { TransactionTypeBreakdown as Breakdown } from "@/lib/metrics/analytics-types";
-import { dashboardTransactionTypes } from "@/lib/metrics/calculate-transaction-type-breakdown";
+import type { TransactionTypeCounts } from "@/lib/analytics/analytics-types";
+import { analyticsTransactionTypes } from "@/lib/analytics/build-analytics-dashboard";
 
 interface TransactionTypeBreakdownProps {
-  breakdown: Breakdown;
+  breakdown: TransactionTypeCounts;
 }
 
 export function TransactionTypeBreakdown({ breakdown }: TransactionTypeBreakdownProps) {
-  const max = Math.max(...dashboardTransactionTypes.map((type) => breakdown[type]), 1);
+  const max = Math.max(...analyticsTransactionTypes.map((type) => breakdown[type]), 1);
 
   return (
     <section className="panel">
@@ -14,7 +14,7 @@ export function TransactionTypeBreakdown({ breakdown }: TransactionTypeBreakdown
         <p className="eyebrow">Transaction types</p>
         <h2 style={{ margin: "0 0 16px" }}>Типы операций</h2>
         <div className="dashboard-bars">
-          {dashboardTransactionTypes.map((type) => (
+          {analyticsTransactionTypes.map((type) => (
             <div className="dashboard-bar-row" key={type}>
               <span>{type}</span>
               <div className="dashboard-bar-track">

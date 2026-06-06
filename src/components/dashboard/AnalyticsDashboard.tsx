@@ -1,19 +1,20 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   loadLatestImportSession,
   type ImportSession,
 } from "@/lib/client/import-session-storage";
-import { buildAnalyticsDashboard } from "@/lib/metrics/build-analytics-dashboard";
-import { DashboardCTA } from "@/components/dashboard/DashboardCTA";
-import { DashboardEmptyState } from "@/components/dashboard/DashboardEmptyState";
-import { DashboardSummaryCards } from "@/components/dashboard/DashboardSummaryCards";
+import { buildAnalyticsDashboard } from "@/lib/analytics/build-analytics-dashboard";
+import { AnalyticsEmptyState } from "@/components/dashboard/AnalyticsEmptyState";
+import { AnalyticsSummaryCards } from "@/components/dashboard/AnalyticsSummaryCards";
+import { BankReadinessPanel } from "@/components/dashboard/BankReadinessPanel";
+import { DataCompletenessChart } from "@/components/dashboard/DataCompletenessChart";
 import { ImportQualityPanel } from "@/components/dashboard/ImportQualityPanel";
-import { ReportReadinessPanel } from "@/components/dashboard/ReportReadinessPanel";
+import { RiskBreakdownPanel } from "@/components/dashboard/RiskBreakdownPanel";
 import { SourceCoveragePanel } from "@/components/dashboard/SourceCoveragePanel";
-import { SourceOfFundsPanel } from "@/components/dashboard/SourceOfFundsPanel";
-import { TransactionActivityChart } from "@/components/dashboard/TransactionActivityChart";
+import { TransactionTimelineChart } from "@/components/dashboard/TransactionTimelineChart";
 import { TransactionTypeBreakdown } from "@/components/dashboard/TransactionTypeBreakdown";
 
 export function AnalyticsDashboard() {
@@ -34,7 +35,7 @@ export function AnalyticsDashboard() {
   }
 
   if (!session) {
-    return <DashboardEmptyState />;
+    return <AnalyticsEmptyState />;
   }
 
   const dashboard = buildAnalyticsDashboard(session);
@@ -47,16 +48,16 @@ export function AnalyticsDashboard() {
           Аналитика криптоистории
         </h1>
         <p className="lead" style={{ marginTop: "14px" }}>
-          Сводка по операциям, качеству импорта, источникам данных и проблемам, которые
-          могут потребовать пояснения для банка, бухгалтера или налогового консультанта.
+          Краткий обзор импортированных операций, качества данных и проблем, которые
+          могут потребовать пояснений для банка, бухгалтера или налогового консультанта.
         </p>
       </div>
 
       <section className="panel">
         <div className="panel-inner">
           <p className="muted" style={{ margin: "0 0 6px" }}>
-            Аналитика построена из локального браузерного сеанса. В этом MVP данные не
-            отправляются на сервер для расчета аналитики.
+            Данные берутся из локального браузерного сеанса. В этом MVP аналитика не
+            требует облачного сохранения.
           </p>
           <p className="muted" style={{ margin: 0 }}>
             Информационный отчет. Не является налоговой, юридической, финансовой или
@@ -65,24 +66,46 @@ export function AnalyticsDashboard() {
         </div>
       </section>
 
-      <DashboardSummaryCards summary={dashboard.summary} />
+      <AnalyticsSummaryCards dashboard={dashboard} />
 
       <div className="dashboard-grid">
-        <ImportQualityPanel metrics={dashboard.importQuality} />
-        <ReportReadinessPanel metrics={dashboard.reportReadiness} />
+        <ImportQualityPanel dashboard={dashboard} />
+        <DataCompletenessChart metrics={dashboard.dataCompleteness} />
       </div>
 
       <div className="dashboard-grid">
         <SourceCoveragePanel metrics={dashboard.sourceCoverage} />
-        <SourceOfFundsPanel metrics={dashboard.sourceOfFunds} />
+        <BankReadinessPanel dashboard={dashboard} />
       </div>
 
       <div className="dashboard-grid">
-        <TransactionActivityChart points={dashboard.transactionActivity} />
-        <TransactionTypeBreakdown breakdown={dashboard.transactionTypeBreakdown} />
+        <RiskBreakdownPanel dashboard={dashboard} />
+        <TransactionTypeBreakdown breakdown={dashboard.transactionsByType} />
       </div>
 
-      <DashboardCTA />
+      <TransactionTimelineChart points={dashboard.monthlyTransactions} />
+
+      <section className="panel">
+        <div className="panel-inner">
+          <div className="panel-head">
+            <div>
+              <p className="eyebrow">Next steps</p>
+              <h2 style={{ margin: 0 }}>Продолжить подготовку отчета</h2>
+            </div>
+            <div className="actions" style={{ marginTop: 0 }}>
+              <Link href="/problems" className="btn btn-secondary">
+                Перейти к проблемам
+              </Link>
+              <Link href="/report" className="btn btn-primary">
+                Открыть отчет
+              </Link>
+              <Link href="/upload" className="btn">
+                Загрузить другой CSV
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

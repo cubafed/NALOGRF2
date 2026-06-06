@@ -1,10 +1,12 @@
-import type { ImportQualityMetrics } from "@/lib/metrics/analytics-types";
+import type { AnalyticsDashboardModel } from "@/lib/analytics/analytics-types";
 
 interface ImportQualityPanelProps {
-  metrics: ImportQualityMetrics;
+  dashboard: AnalyticsDashboardModel;
 }
 
-export function ImportQualityPanel({ metrics }: ImportQualityPanelProps) {
+export function ImportQualityPanel({ dashboard }: ImportQualityPanelProps) {
+  const { dataCompleteness } = dashboard;
+
   return (
     <section className="panel">
       <div className="panel-inner">
@@ -13,40 +15,33 @@ export function ImportQualityPanel({ metrics }: ImportQualityPanelProps) {
             <p className="eyebrow">Качество импорта</p>
             <h2 style={{ margin: 0 }}>Import quality</h2>
           </div>
-          <span className="badge">{metrics.importCompletenessPercent}% parsed</span>
+          <span className="badge">{dashboard.importCompletenessPercent}% complete</span>
         </div>
         <div className="metric-grid">
           <div className="metric">
-            <span>Total raw rows</span>
-            <strong>{metrics.totalRows}</strong>
-          </div>
-          <div className="metric">
             <span>Parsed rows</span>
-            <strong>{metrics.parsedRows}</strong>
+            <strong>{dataCompleteness.parsedRows}</strong>
           </div>
           <div className="metric">
             <span>Rows with warnings</span>
-            <strong>{metrics.warningRows}</strong>
+            <strong>{dataCompleteness.warningRows}</strong>
           </div>
           <div className="metric">
             <span>Rows with errors</span>
-            <strong>{metrics.errorRows}</strong>
+            <strong>{dataCompleteness.errorRows}</strong>
           </div>
           <div className="metric">
-            <span>Missing amount</span>
-            <strong>{metrics.missingAmountCount}</strong>
-          </div>
-          <div className="metric">
-            <span>Invalid numeric value</span>
-            <strong>{metrics.invalidNumericValueCount}</strong>
+            <span>Missing fiat value</span>
+            <strong>{dashboard.missingFiatValueCount}</strong>
           </div>
           <div className="metric">
             <span>Unknown transaction type</span>
-            <strong>{metrics.unknownTransactionTypeCount}</strong>
+            <strong>{dashboard.unknownTransactionTypeCount}</strong>
           </div>
-        </div>
-        <div className="progress-track" aria-label="Import completeness">
-          <span style={{ width: `${metrics.importCompletenessPercent}%` }} />
+          <div className="metric">
+            <span>Incomplete rows</span>
+            <strong>{dataCompleteness.incompleteRows}</strong>
+          </div>
         </div>
       </div>
     </section>

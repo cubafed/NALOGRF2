@@ -1,11 +1,11 @@
-import type { SourceCoverageMetrics } from "@/lib/metrics/analytics-types";
+import type { SourceCoverageMetrics } from "@/lib/analytics/analytics-types";
 
 interface SourceCoveragePanelProps {
   metrics: SourceCoverageMetrics;
 }
 
 export function SourceCoveragePanel({ metrics }: SourceCoveragePanelProps) {
-  const max = Math.max(...metrics.transactionsPerSource.map((source) => source.count), 1);
+  const max = Math.max(...metrics.transactionsBySource.map((source) => source.count), 1);
 
   return (
     <section className="panel">
@@ -15,26 +15,13 @@ export function SourceCoveragePanel({ metrics }: SourceCoveragePanelProps) {
             <p className="eyebrow">Источники данных</p>
             <h2 style={{ margin: 0 }}>Source coverage</h2>
           </div>
-          <span className="badge">{metrics.status}</span>
+          <span className="badge">{metrics.sourceCount} sources</span>
         </div>
-        <div className="metric-grid">
-          <div className="metric">
-            <span>Unique sources</span>
-            <strong>{metrics.uniqueSources}</strong>
-          </div>
-          <div className="metric">
-            <span>Sources with issues</span>
-            <strong>{metrics.sourcesWithIssues.length}</strong>
-          </div>
-        </div>
-        <p className="muted" style={{ marginTop: "18px" }}>
-          Transactions per source, sorted by operation count:
-        </p>
-        <div className="dashboard-bars">
-          {metrics.transactionsPerSource.length === 0 ? (
+        <div className="dashboard-bars" style={{ marginTop: "18px" }}>
+          {metrics.transactionsBySource.length === 0 ? (
             <p className="muted">Источники не найдены в локальном сеансе.</p>
           ) : (
-            metrics.transactionsPerSource.map((source) => (
+            metrics.transactionsBySource.map((source) => (
               <div className="dashboard-bar-row" key={source.label}>
                 <span>{source.label}</span>
                 <div className="dashboard-bar-track">
@@ -45,14 +32,24 @@ export function SourceCoveragePanel({ metrics }: SourceCoveragePanelProps) {
             ))
           )}
         </div>
-        {metrics.sourcesWithIssues.length > 0 && (
-          <p className="muted">
-            Источники с техническими замечаниями: {metrics.sourcesWithIssues.join(", ")}
-          </p>
+        {metrics.sourcesWithMostFindings.length > 0 && (
+          <div style={{ marginTop: "18px" }}>
+            <p className="muted" style={{ margin: "0 0 10px" }}>
+              Sources with most findings:
+            </p>
+            <div className="report-list">
+              {metrics.sourcesWithMostFindings.map((source) => (
+                <div className="report-row" key={source.label}>
+                  <strong>{source.count}</strong>
+                  <span>{source.label}</span>
+                  <span className="muted">findings</span>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
-        <p className="muted" style={{ marginBottom: 0 }}>
-          Этот MVP показывает источники из загруженного CSV. Специализированные парсеры
-          бирж не реализованы в этом PR.
+        <p className="muted" style={{ marginBottom: 0, marginTop: "18px" }}>
+          {metrics.note}
         </p>
       </div>
     </section>
