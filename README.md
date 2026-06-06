@@ -105,6 +105,22 @@ npm run build
 
 The production build does not require environment variables.
 
+## PR Verification
+
+Local:
+
+```bash
+npm run verify:pr
+```
+
+CI:
+
+```bash
+npm run verify:ci
+```
+
+This runs tests, build, diff summary, changed files, and forbidden-scope checks.
+
 ## Next Planned PRs
 
 1. Add Supabase project QA with a real test project and documented manual setup.

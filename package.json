@@ -9,7 +9,9 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "verify:pr": "node ./scripts/verify-pr.mjs",
+    "verify:ci": "node ./scripts/verify-pr.mjs --ci"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",

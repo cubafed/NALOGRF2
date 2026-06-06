@@ -41,6 +41,7 @@ Framer Motion (animations) · Recharts (charts) · Lucide React (icons) · Vites
 An `ImportSession` (transactions + warnings + errors + raw rows + risk result) is the central object.
 
 **Tests:** Vitest under `src/tests/`. Factory-helper pattern (`tx(overrides)`, `rawRow()`, `warning()`, `error()`). Run with `npm run test`.
+**PR verification:** run `npm run verify:pr` before reporting completion.
 
 ## Product Scope
 
@@ -134,9 +135,8 @@ AML conclusions, or claims that funds are clean or dirty.
 - Before final response, always run:
 
 ```bash
-npm run test
-npm run build
+npm run verify:pr
 ```
 
-- Do not report completion if tests or build fail.
-- If tests or build fail, fix the failure inside the approved scope or report the blocker clearly.
+- Do not report completion if verification fails.
+- If verification fails, fix the failure inside the approved scope or report the blocker clearly.
