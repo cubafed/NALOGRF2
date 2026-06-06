@@ -4,15 +4,24 @@ This repository is the standalone `Crypto Audit Report` app.
 
 ## Product Scope
 
-Crypto Audit Report helps users prepare crypto transaction history for a bank, accountant,
-tax consultant, or source-of-funds review.
+Crypto Audit Report is a crypto audit and tax-readiness product for preparing
+crypto transaction history for bank, accountant, tax-consultant, and
+source-of-funds review.
 
-This is not:
+The current MVP prepares transaction history, review findings, source-of-funds
+explanations, report previews, document checklists, and local exports.
 
-- a tax filing product;
+The current MVP is not:
+
+- an official tax calculator;
+- a tax filing engine;
 - an AML certification product;
+- a bank approval product;
 - a bank bypass product;
 - legal, tax, financial, or AML advice.
+
+Future deterministic tax-calculation modules may be added only through explicitly
+approved PRs with clear methodology, jurisdiction scope, tests, and disclaimers.
 
 ## Repository Boundaries
 
@@ -33,6 +42,10 @@ This is not:
 - Bybit parser
 - exchange APIs
 - AML integrations
+- AML scoring or AML checks
+- official tax due calculation
+- FIFO/LIFO gain/loss engine
+- 3-NDFL filing
 - tax filing
 - AI-generated calculations
 
@@ -51,12 +64,18 @@ Never use these phrases in product UI, findings, docs, or summaries:
 
 Use safer product language:
 
+- tax-readiness
+- accountant review
+- tax-consultant review
+- source-of-funds review
+- report preparation
 - needs review
 - review finding
 - source-of-funds gap
 - missing data
 - may require explanation
 - could be requested by a bank/accountant
+- document checklist
 
 Findings must explain what may need review. Do not make legal conclusions, tax conclusions,
 AML conclusions, or claims that funds are clean or dirty.
@@ -65,6 +84,8 @@ AML conclusions, or claims that funds are clean or dirty.
 
 - Parser, risk, scoring, and future report logic must be deterministic and reproducible.
 - Do not use AI or LLM logic for calculations, classification, risk rules, tax logic, or audit decisions.
+- Future deterministic calculation modules are future scope only and require an
+  explicitly approved PR with methodology, jurisdiction scope, tests, and disclaimers.
 - Bad or incomplete data should produce structured warnings, errors, or review findings.
 - Do not silently drop user-provided rows.
 - Preserve raw source data where relevant for auditability.

@@ -1,6 +1,12 @@
 # Crypto Audit Report
 
-Dark fintech/compliance landing and static demo report for a future Crypto Source-of-Funds & Tax Audit product.
+Dark fintech/compliance app for crypto audit, source-of-funds review, and tax-readiness workflows.
+
+Crypto Audit Report is a crypto audit and tax-readiness product for preparing crypto transaction history for bank, accountant, tax-consultant, and source-of-funds review.
+
+The current MVP does not calculate official tax due, does not file tax declarations, and does not provide legal, tax, financial, or AML advice.
+
+Future deterministic tax-calculation modules may be added only through explicitly approved PRs with clear methodology, jurisdiction scope, tests, and disclaimers.
 
 Primary message:
 
@@ -14,6 +20,8 @@ Primary message:
 - Browser-only Universal CSV upload preview at `/upload`.
 - Deterministic review finding engine and problems dashboard.
 - Browser-only report preview and print/save-as-PDF action.
+- Transaction history preparation, source-of-funds explanations, document
+  checklists, missing data review, and local exports.
 - Static partner pages and local partner attribution skeleton.
 - Optional Supabase auth and persistence foundation for future cloud save flows.
 - Stable TypeScript domain and partner types.
@@ -39,6 +47,10 @@ Primary message:
 - Affiliate payouts.
 - Exchange APIs.
 - AML checks.
+- AML scoring.
+- Official tax due calculation.
+- FIFO/LIFO gain/loss engine.
+- 3-NDFL filing.
 - Country-specific tax filing.
 - AI-generated calculations.
 
@@ -58,7 +70,8 @@ Primary message:
 - `/partners/exchanges` — static partner page for crypto exchanges and P2P
   communities. Current MVP supports Universal CSV only.
 - `/partners/accountants` — static partner page for accountants and tax
-  consultants. This is not tax advice and not a filing engine.
+  consultants. This supports tax-readiness and tax-consultant review, but is not
+  an official tax calculator, tax advice, or a filing engine.
 - `/account` — optional Supabase auth foundation. The app works when Supabase is
   not configured. When Supabase is configured, it supports email magic-link sign-in
   and sign-out.
@@ -115,8 +128,9 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 10. Select a PDF file and click `Загрузить PDF`.
 11. Confirm the attached file metadata appears on the detail page.
 
-Storage upload is explicit and PDF-only. Payment, tax filing, exchange APIs,
-external analytics, raw CSV upload, automatic upload, and server-side PDF
+Storage upload is explicit and PDF-only. Payment, official tax due calculation,
+FIFO/LIFO gain/loss engines, 3-NDFL filing, tax filing, AML scoring, exchange
+APIs, external analytics, raw CSV upload, automatic upload, and server-side PDF
 generation are not implemented.
 
 ## Setup

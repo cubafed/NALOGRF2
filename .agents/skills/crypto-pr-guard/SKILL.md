@@ -9,6 +9,15 @@ It is a scope, safety, and validation checklist for future Codex tasks.
 - Identify the approved PR number and brief before editing.
 - Keep the PR to one narrow feature.
 - Do not add future features, routes, services, or integrations unless explicitly approved.
+- Product positioning: Crypto Audit Report is a crypto audit and tax-readiness product for
+  preparing crypto transaction history for bank, accountant, tax-consultant, and
+  source-of-funds review.
+- Current MVP scope is transaction history preparation, review findings,
+  source-of-funds explanations, report previews, document checklists, and local exports.
+- The current MVP does not calculate official tax due, does not file tax declarations,
+  and does not provide legal, tax, financial, or AML advice.
+- Future deterministic tax-calculation modules may be added only through explicitly
+  approved PRs with clear methodology, jurisdiction scope, tests, and disclaimers.
 
 ## Forbidden Feature Check
 
@@ -25,6 +34,10 @@ Before and after changes, verify the task did not add:
 - Bybit parser
 - exchange APIs
 - AML integrations or AML checks
+- AML scoring
+- official tax due calculation
+- FIFO/LIFO gain/loss engine
+- 3-NDFL filing
 - tax filing
 - AI-generated calculations
 
@@ -52,12 +65,18 @@ Avoid unsafe language:
 
 Prefer:
 
+- tax-readiness
+- accountant review
+- tax-consultant review
+- source-of-funds review
+- report preparation
 - needs review
 - review finding
 - source-of-funds gap
 - missing data
 - may require explanation
 - could be requested by a bank/accountant
+- document checklist
 
 Findings should organize information and explain review needs. They must not provide legal,
 tax, financial, or AML advice.
