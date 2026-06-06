@@ -1035,6 +1035,45 @@ code {
   }
 }
 
+/* ─── Dashboard grid ───────────────────────────────────────────── */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.completeness-bar-track {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--panel-2);
+  overflow: hidden;
+}
+
+.completeness-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width var(--t-slow);
+}
+
+.source-bar-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--panel-2);
+  overflow: hidden;
+}
+
+.source-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width var(--t-slow);
+}
+
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 900px) {
   .topbar-inner,
   .panel-head,
