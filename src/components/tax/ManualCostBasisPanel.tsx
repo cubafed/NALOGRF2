@@ -19,6 +19,7 @@ import type {
   PreliminaryTaxEstimateLine,
 } from "@/lib/tax/manual-cost-basis-types";
 import { PreliminaryTaxEstimatePanel } from "@/components/tax/PreliminaryTaxEstimatePanel";
+import { TaxNextStepsPanel } from "@/components/tax/TaxNextStepsPanel";
 
 const TAX_DISCLAIMER =
   "Не является налоговой, юридической или финансовой консультацией. Расчет предварительный и основан только на данных пользователя.";
@@ -261,6 +262,8 @@ export function ManualCostBasisPanel() {
           </div>
         </div>
       </section>
+
+      <TaxNextStepsPanel estimate={estimate} />
     </div>
   );
 }
