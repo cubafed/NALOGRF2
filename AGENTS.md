@@ -2,6 +2,46 @@
 
 This repository is the standalone `Crypto Audit Report` app.
 
+## Project State (read this first)
+
+Single-page map of what already exists, so an agent does not reinvent or duplicate it.
+Keep this section updated whenever a route, lib module, or major component is added.
+
+**Stack:** Next.js 15 (App Router) · React 19 · TypeScript · Tailwind v4 ·
+Framer Motion (animations) · Recharts (charts) · Lucide React (icons) · Vitest (tests).
+
+**Routes (`app/`):**
+
+| Route | Purpose |
+|---|---|
+| `/` | Landing |
+| `/demo` | Static demo report |
+| `/upload` | Browser-only universal CSV import + preview |
+| `/dashboard` | Local analytics (fiat flow, completeness, activity, source coverage) |
+| `/problems` | Deterministic review findings dashboard |
+| `/report` | Report preview + bank-readiness document checklist + print/save-as-PDF |
+| `/saved-reports` | Saved-report list (local service; Supabase variant gated/optional) |
+| `/account` | Auth status (optional Supabase foundation) |
+| `/partners` | Static partner pages + local attribution |
+
+**Library modules (`src/lib/`):**
+
+- `parsers/` — `universal-csv-parser.ts` (canonical headers: date, type, asset, amount + optional fields). Produces transactions, warnings, errors, raw rows.
+- `risk/` — deterministic engine: 6 rules in `risk-rules.ts`, readiness score, `run-risk-engine.ts`.
+- `metrics/` — pure analytics functions: fiat flow, data completeness, source coverage, monthly activity.
+- `report/` — report preview, document checklist/catalog, derived questions, export filename.
+- `client/` — browser storage helpers (import session, document checklist, partner attribution). Currently `sessionStorage`.
+- `persistence/` — saved-report service (local + Supabase variant) + serialization.
+- `supabase/` — optional client/server/config (gated, off by default).
+- `partners/` — partner attribution logic.
+- `demo/` — sample CSV + demo report fixtures.
+- `domain/` — shared types (`Transaction`, `TransactionType`, `Finding`, `Report`, etc.).
+
+**State model:** all user data lives client-side only (no backend persistence by default).
+An `ImportSession` (transactions + warnings + errors + raw rows + risk result) is the central object.
+
+**Tests:** Vitest under `src/tests/`. Factory-helper pattern (`tx(overrides)`, `rawRow()`, `warning()`, `error()`). Run with `npm run test`.
+
 ## Product Scope
 
 Crypto Audit Report helps users prepare crypto transaction history for a bank, accountant,
@@ -16,7 +56,8 @@ This is not:
 
 ## Repository Boundaries
 
-- Work only inside `/Users/daviddaler/Documents/crypto-audit-report`.
+- Work only inside this repository (`cubafed/nalogrf2`). Use repository-relative paths;
+  do not assume any specific absolute checkout location.
 - Do not modify sibling projects such as `hrq/`, `cryptondfl-site/`, or `cryptondfl-design-source/`.
 - Do not modify files outside this repository.
 
@@ -73,12 +114,17 @@ AML conclusions, or claims that funds are clean or dirty.
 
 - Parser logic stays in `src/lib/parsers/`.
 - Risk logic stays in `src/lib/risk/`.
+- Analytics/metrics logic stays in `src/lib/metrics/` (pure, deterministic functions only).
+- Report logic stays in `src/lib/report/`.
 - Client-only storage stays in `src/lib/client/`.
-- UI components stay in `src/components/`.
+- UI components stay in `src/components/`, grouped by feature
+  (e.g. `src/components/dashboard/`, `src/components/problems/`, `src/components/report/`,
+  `src/components/upload/`, `src/components/ui/` for shared primitives).
 - Demo fixtures stay in `src/lib/demo/`.
 - Domain types stay in `src/lib/domain/`.
 - Business logic must not be duplicated inside React components.
-- React components may orchestrate parser/risk calls but should not reimplement parser or risk rules.
+- React components may orchestrate parser/risk/metrics calls but must not reimplement
+  parser, risk, or metric rules.
 
 ## PR Workflow
 
