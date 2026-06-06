@@ -27,11 +27,11 @@ export function ReportPreview() {
 
   if (session === "loading") {
     return (
-      <section className="panel">
-        <div className="panel-inner">
-          <p className="muted">Загрузка...</p>
-        </div>
-      </section>
+      <div className="upload-stack">
+        <div className="skeleton" style={{ height: 80, borderRadius: "var(--radius-md)" }} />
+        <div className="skeleton" style={{ height: 220, borderRadius: "var(--radius-md)" }} />
+        <div className="skeleton" style={{ height: 400, borderRadius: "var(--radius-md)" }} />
+      </div>
     );
   }
 
