@@ -199,6 +199,9 @@ export function CsvUploadPanel() {
             <span className="badge">
               {uploadState.result.summary.transactionCount} parsed transactions
             </span>
+            <Link href="/dashboard" className="btn btn-secondary" style={{ fontSize: "13px" }}>
+              Открыть аналитику
+            </Link>
           </div>
           <ImportSummary summary={uploadState.result.summary} />
           {riskResult && <ReviewFindingsPanel result={riskResult} />}
@@ -223,6 +226,9 @@ function ReviewFindingsPanel({ result }: { result: RiskEngineResult }) {
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <span className="badge">{formatReadinessLabel(result.readinessLabel)}</span>
+            <Link href="/dashboard" className="btn btn-secondary" style={{ fontSize: "13px" }}>
+              Аналитика
+            </Link>
             <Link href="/problems" className="btn btn-primary" style={{ fontSize: "13px" }}>
               Посмотреть проблемы
             </Link>

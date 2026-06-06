@@ -15,6 +15,7 @@ export function Header() {
           <Link href="/">Главная</Link>
           <Link href="/demo">Демо-отчет</Link>
           <Link href="/upload">Загрузить CSV</Link>
+          <Link href="/dashboard">Аналитика</Link>
           <Link href="/problems">Проблемы</Link>
           <Link href="/report">Отчет</Link>
           <Link href="/partners">Партнерам</Link>

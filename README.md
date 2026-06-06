@@ -13,6 +13,8 @@ Primary message:
 - Static demo report page at `/demo`.
 - Browser-only Universal CSV upload preview at `/upload`.
 - Deterministic review finding engine and problems dashboard.
+- Browser-only analytics dashboard at `/dashboard`, built from the latest local
+  import session and existing deterministic review findings.
 - Browser-only report preview and print/save-as-PDF action.
 - Static partner pages and local partner attribution skeleton.
 - Optional Supabase auth and persistence foundation for future cloud save flows.
@@ -36,6 +38,7 @@ Primary message:
 - Required Supabase runtime.
 - Partner dashboard.
 - Backend analytics.
+- Server-side analytics storage or event tracking.
 - Affiliate payouts.
 - Exchange APIs.
 - AML checks.
@@ -47,6 +50,11 @@ Primary message:
 - `/` — landing.
 - `/demo` — static demo report.
 - `/upload` — browser-only CSV import, parser preview and review findings.
+- `/dashboard` — browser-only analytics dashboard built from the latest local
+  import/risk session. It summarizes import quality, source coverage,
+  source-of-funds review metrics, report readiness, monthly activity, finding
+  severity, and transaction type breakdowns. It does not call external APIs and
+  does not calculate new risk findings.
 - `/problems` — problems dashboard built from the latest local import/risk session.
 - `/report` — browser-only structured report preview built from the latest local
   import/risk session (`src/lib/report/`). Not PDF generation. Reads the session
@@ -141,4 +149,4 @@ The production build does not require environment variables.
 
 1. Add signed download links for attached report files.
 2. Add saved report delete/archive UI.
-3. Add storage upload QA notes for a real Supabase project.
+3. Add analytics export planning without backend calculations.

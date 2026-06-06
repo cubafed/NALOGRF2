@@ -48,13 +48,22 @@ export function ReportPreview() {
           <p className="eyebrow">Навигация</p>
           <h2 style={{ margin: 0 }}>Структурированный предпросмотр</h2>
         </div>
-        <Link
-          href="/problems"
-          className="btn"
-          style={{ fontSize: "12px", opacity: 0.8 }}
-        >
-          Назад к проблемам
-        </Link>
+        <div className="actions" style={{ marginTop: 0 }}>
+          <Link
+            href="/dashboard"
+            className="btn btn-secondary"
+            style={{ fontSize: "12px" }}
+          >
+            Вернуться к аналитике
+          </Link>
+          <Link
+            href="/problems"
+            className="btn"
+            style={{ fontSize: "12px", opacity: 0.8 }}
+          >
+            Назад к проблемам
+          </Link>
+        </div>
       </div>
 
       <ReportPrintActions report={model} />

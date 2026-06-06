@@ -610,6 +610,113 @@ textarea {
   padding: 5px 10px;
 }
 
+.dashboard-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.progress-track {
+  height: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(26, 130, 255, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  margin-top: 18px;
+}
+
+.progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--blue), var(--green));
+}
+
+.dashboard-bars {
+  display: grid;
+  gap: 12px;
+}
+
+.dashboard-bar-row {
+  display: grid;
+  grid-template-columns: minmax(96px, 0.75fr) minmax(0, 1fr) 42px;
+  gap: 10px;
+  align-items: center;
+  color: #dcecff;
+  font-size: 13px;
+}
+
+.dashboard-bar-row > span {
+  overflow-wrap: anywhere;
+}
+
+.dashboard-bar-track {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.dashboard-bar-track i {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  border-radius: inherit;
+  background: var(--blue);
+}
+
+.dashboard-bar-track i.severity-critical {
+  background: var(--red);
+}
+
+.dashboard-bar-track i.severity-medium {
+  background: var(--amber);
+}
+
+.dashboard-bar-track i.severity-low {
+  background: var(--blue);
+}
+
+.monthly-chart {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(62px, 1fr));
+  gap: 10px;
+  align-items: end;
+  min-height: 180px;
+  padding-top: 14px;
+}
+
+.monthly-bar {
+  display: grid;
+  min-width: 0;
+  justify-items: center;
+  gap: 7px;
+}
+
+.monthly-bar span {
+  width: min(34px, 70%);
+  border-radius: 8px 8px 3px 3px;
+  background: linear-gradient(180deg, var(--blue), rgba(26, 130, 255, 0.35));
+  box-shadow: 0 14px 30px rgba(26, 130, 255, 0.16);
+}
+
+.monthly-bar strong {
+  font-size: 13px;
+}
+
+.monthly-bar small {
+  color: var(--muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
 .report-file-list {
   display: grid;
   gap: 10px;
@@ -664,6 +771,8 @@ code {
 
   .hero,
   .grid-3,
+  .dashboard-summary-grid,
+  .dashboard-grid,
   .review-findings-grid,
   .upload-grid,
   .partner-hero-grid,
@@ -685,6 +794,7 @@ code {
   }
 
   .metric-grid,
+  .dashboard-bar-row,
   .report-row {
     grid-template-columns: 1fr;
   }

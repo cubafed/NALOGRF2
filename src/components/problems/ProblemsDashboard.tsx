@@ -73,6 +73,9 @@ export function ProblemsDashboard() {
           <h2 style={{ margin: 0 }}>{fileName ?? "Без имени файла"}</h2>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <Link href="/dashboard" className="btn btn-secondary" style={{ fontSize: "13px" }}>
+            Смотреть аналитику
+          </Link>
           <Link href="/report" className="btn btn-primary" style={{ fontSize: "13px" }}>
             Сформировать предпросмотр отчета
           </Link>
