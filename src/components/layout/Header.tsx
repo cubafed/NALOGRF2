@@ -8,6 +8,7 @@ const NAV_LINKS = [
   { href: "/", label: "Главная" },
   { href: "/demo", label: "Демо" },
   { href: "/upload", label: "Загрузить" },
+  { href: "/dashboard", label: "Аналитика" },
   { href: "/problems", label: "Проблемы" },
   { href: "/report", label: "Отчет" },
   { href: "/partners", label: "Партнерам" },
