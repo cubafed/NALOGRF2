@@ -25,6 +25,9 @@ const SOURCE_OF_FUNDS_RULE_IDS: ReadonlySet<string> = new Set([
   "large_fiat_withdrawal",
   "unknown_source_wallet",
   "missing_cost_basis_basic",
+  "rapid_transit",
+  "concentrated_counterparty",
+  "high_p2p_share",
 ]);
 
 const UNKNOWN_SOURCE_LABEL = "Неизвестный источник";

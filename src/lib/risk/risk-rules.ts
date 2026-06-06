@@ -10,7 +10,184 @@ export const riskRules: RiskRule[] = [
   unknownSourceWalletRule,
   unknownTransactionTypeRule,
   missingCostBasisBasicRule,
+  rapidTransitRule,
+  concentratedCounterpartyRule,
+  highP2pShareRule,
 ];
+
+// RU bank-trigger context (115-ФЗ): patterns banks commonly ask to explain. Findings are
+// framed strictly as "may require explanation" — never a judgement about the funds.
+const TRANSIT_INFLOW_TYPES = new Set(["deposit", "p2p", "income"]);
+const TRANSIT_OUTFLOW_TYPES = new Set(["withdrawal"]);
+const INFLOW_TYPES = new Set(["sell", "deposit", "p2p", "income"]);
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function fiatCurrencyKey(transaction: Transaction): string {
+  const text = transaction.fiatCurrency?.trim().toUpperCase() ?? "";
+  return text.length === 0 ? "—" : text;
+}
+
+function parsedTime(transaction: Transaction): number | null {
+  const value = transaction.timestamp ?? transaction.date;
+  if (!value) return null;
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+function rapidTransitRule({ transactions, options }: Parameters<RiskRule>[0]): RiskFinding[] {
+  const windowMs = options.rapidTransitWindowDays * DAY_MS;
+  const threshold = options.rapidTransitThreshold;
+  const affected = new Map<string, Transaction>();
+
+  // Compare only within the same fiat currency; never mix currencies.
+  const byCurrency = new Map<string, Transaction[]>();
+  for (const transaction of transactions) {
+    const key = fiatCurrencyKey(transaction);
+    const list = byCurrency.get(key) ?? [];
+    list.push(transaction);
+    byCurrency.set(key, list);
+  }
+
+  for (const list of byCurrency.values()) {
+    const inflows = list.filter(
+      (t) => TRANSIT_INFLOW_TYPES.has(t.type) && (numericValue(t.fiatValue) ?? 0) >= threshold,
+    );
+    const outflows = list.filter(
+      (t) => TRANSIT_OUTFLOW_TYPES.has(t.type) && (numericValue(t.fiatValue) ?? 0) >= threshold,
+    );
+
+    for (const inflow of inflows) {
+      const inTime = parsedTime(inflow);
+      if (inTime === null) continue;
+      for (const outflow of outflows) {
+        const outTime = parsedTime(outflow);
+        if (outTime === null) continue;
+        if (outTime >= inTime && outTime - inTime <= windowMs) {
+          affected.set(inflow.id, inflow);
+          affected.set(outflow.id, outflow);
+        }
+      }
+    }
+  }
+
+  if (affected.size === 0) return [];
+
+  return [
+    makeFinding({
+      id: "risk-rapid_transit",
+      ruleId: "rapid_transit",
+      severity: "medium",
+      title: "Поступление и быстрый вывод средств",
+      explanation:
+        "Найдены крупные поступления с сопоставимым выводом в течение короткого периода.",
+      whyItMatters:
+        "Быстрый ввод и вывод средств может потребовать пояснения цели операций для банка.",
+      recommendedAction:
+        "Подготовьте пояснение характера операций, банковскую выписку и подтверждения сделок.",
+      documentsNeeded: ["bank statement", "exchange statement", "accountant note"],
+      affected: [...affected.values()],
+    }),
+  ];
+}
+
+function concentratedCounterpartyRule({
+  transactions,
+  options,
+}: Parameters<RiskRule>[0]): RiskFinding[] {
+  // Group by counterparty + currency; monetary totals never cross currencies.
+  const groups = new Map<string, { transactions: Transaction[]; volume: number }>();
+
+  for (const transaction of transactions) {
+    const counterparty = normalizedText(transaction.counterparty);
+    if (counterparty === "") continue;
+    const value = numericValue(transaction.fiatValue);
+    if (value === null) continue;
+
+    const key = `${counterparty}|${fiatCurrencyKey(transaction)}`;
+    const group = groups.get(key) ?? { transactions: [], volume: 0 };
+    group.transactions.push(transaction);
+    group.volume += value;
+    groups.set(key, group);
+  }
+
+  const affected = new Map<string, Transaction>();
+  for (const group of groups.values()) {
+    const overVolume = group.volume >= options.concentratedCounterpartyVolumeThreshold;
+    const overCount = group.transactions.length >= options.concentratedCounterpartyCountThreshold;
+    if (overVolume || overCount) {
+      for (const transaction of group.transactions) affected.set(transaction.id, transaction);
+    }
+  }
+
+  if (affected.size === 0) return [];
+
+  return [
+    makeFinding({
+      id: "risk-concentrated_counterparty",
+      ruleId: "concentrated_counterparty",
+      severity: "medium",
+      title: "Концентрация операций с одним контрагентом",
+      explanation:
+        "Найден значительный объём или число операций с одним и тем же контрагентом.",
+      whyItMatters:
+        "Концентрация операций с одним контрагентом может потребовать пояснения характера отношений.",
+      recommendedAction:
+        "Подготовьте подтверждения сделок с контрагентом и пояснение характера операций.",
+      documentsNeeded: ["P2P order proof", "bank statement", "accountant note"],
+      affected: [...affected.values()],
+    }),
+  ];
+}
+
+function highP2pShareRule({ transactions, options }: Parameters<RiskRule>[0]): RiskFinding[] {
+  // Per currency: P2P share of total inflow.
+  const byCurrency = new Map<
+    string,
+    { totalInflow: number; p2pInflow: number; p2pTransactions: Transaction[] }
+  >();
+
+  for (const transaction of transactions) {
+    if (!INFLOW_TYPES.has(transaction.type)) continue;
+    const value = numericValue(transaction.fiatValue);
+    if (value === null) continue;
+
+    const key = fiatCurrencyKey(transaction);
+    const group = byCurrency.get(key) ?? { totalInflow: 0, p2pInflow: 0, p2pTransactions: [] };
+    group.totalInflow += value;
+    if (transaction.type === "p2p") {
+      group.p2pInflow += value;
+      group.p2pTransactions.push(transaction);
+    }
+    byCurrency.set(key, group);
+  }
+
+  const affected = new Map<string, Transaction>();
+  for (const group of byCurrency.values()) {
+    if (group.totalInflow <= 0) continue;
+    const share = group.p2pInflow / group.totalInflow;
+    if (share >= options.highP2pShareRatio && group.p2pInflow >= options.highP2pShareMinVolume) {
+      for (const transaction of group.p2pTransactions) affected.set(transaction.id, transaction);
+    }
+  }
+
+  if (affected.size === 0) return [];
+
+  return [
+    makeFinding({
+      id: "risk-high_p2p_share",
+      ruleId: "high_p2p_share",
+      severity: "low",
+      title: "Высокая доля P2P в поступлениях",
+      explanation: "P2P-операции составляют значительную долю всех поступлений.",
+      whyItMatters:
+        "Высокая доля P2P-поступлений может потребовать пояснения характера операций для банка.",
+      recommendedAction:
+        "Подготовьте подтверждения P2P-сделок и пояснение характера операций.",
+      documentsNeeded: ["P2P order proof", "exchange statement", "accountant note"],
+      affected: [...affected.values()],
+    }),
+  ];
+}
 
 function missingFiatValueRule({ transactions }: Parameters<RiskRule>[0]): RiskFinding[] {
   const affected = transactions.filter((transaction) => isMissing(transaction.fiatValue));

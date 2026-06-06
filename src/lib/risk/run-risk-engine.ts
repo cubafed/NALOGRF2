@@ -9,6 +9,12 @@ const defaultOptions: Required<RiskEngineOptions> = {
   criticalP2pInflowThreshold: 7000,
   largeFiatWithdrawalThreshold: 3000,
   criticalFiatWithdrawalThreshold: 10000,
+  rapidTransitWindowDays: 3,
+  rapidTransitThreshold: 5000,
+  concentratedCounterpartyVolumeThreshold: 10000,
+  concentratedCounterpartyCountThreshold: 5,
+  highP2pShareRatio: 0.5,
+  highP2pShareMinVolume: 5000,
 };
 
 export function runRiskEngine(
