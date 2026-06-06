@@ -44,25 +44,34 @@ An `ImportSession` (transactions + warnings + errors + raw rows + risk result) i
 
 ## Product Scope
 
-Crypto Audit Report helps users prepare crypto transaction history for a bank, accountant,
-tax consultant, or source-of-funds review.
+Crypto Audit Report is being built into a crypto tax + portfolio platform in the class of
+Koinly / BitNalog (but aiming to be better), RU-first with an architecture designed for
+international markets.
 
-Strategic product lines include:
+Approved strategic product lines:
 
-- Crypto Tax Calculator / Tax-Readiness;
-- Bank / Source-of-Funds Audit Package;
-- Portfolio Analytics.
+- **Crypto Tax Calculator** — deterministic engine with cost-basis lot matching
+  (FIFO first; LIFO/HIFO/ACB/weighted-average behind a method abstraction), per-jurisdiction
+  rules/rates/forms (RU 3-НДФЛ first), produces a **preliminary** tax figure for review.
+- **Portfolio Analytics** — holdings, valuation, realized/unrealized P&L.
+- **Import Integrations** — exchange/wallet CSV adapters, read-only API connectors, and
+  blockchain address/xpub sync, normalized into the canonical `Transaction`.
+- **AI Advisor** — explains results and drafts document/declaration text. The AI NEVER
+  produces tax numbers; all numbers come from the deterministic engine.
+- **Source-of-Funds Audit Package** — bank/accountant document pack + explanation-letter
+  templates (RU 115-ФЗ context), framed as "may require explanation", never as bypass.
 
-Deterministic tax calculator modules are allowed only as future explicitly approved
-scope with methodology, jurisdiction scope, supported/unsupported operation types,
-tests, disclaimers, and excluded-from-estimate behavior.
+All tax-calculator work must ship with methodology, jurisdiction scope,
+supported/unsupported operation types, tests, disclaimers, and excluded-from-estimate
+behavior. The tax output is always **preliminary, for review with an accountant or tax
+consultant** — never an official filing or an official amount due.
 
-The current MVP is not:
+The product is NOT:
 
-- a tax filing product;
-- a tax payment product;
-- an AML certification product;
-- a bank bypass product;
+- a tax-filing product (no automated submission to ФНС or any tax authority);
+- a tax-payment product (no collection or remittance of tax);
+- an AML certification or AML-scoring product;
+- a bank-bypass product;
 - legal, tax, financial, or AML advice.
 
 ## Repository Boundaries
@@ -72,24 +81,33 @@ The current MVP is not:
 - Do not modify sibling projects such as `hrq/`, `cryptondfl-site/`, or `cryptondfl-design-source/`.
 - Do not modify files outside this repository.
 
-## Forbidden Features Unless Explicitly Approved
+## Approved Features (require methodology, tests, disclaimers)
 
-- Supabase
-- auth
-- payment
-- PDF generation
-- backend persistence
-- API routes
-- server actions
-- Binance parser
-- Bybit parser
-- exchange APIs
-- AML integrations
-- tax filing
-- tax payment
-- official tax due calculation
-- FIFO/LIFO gain/loss engine
-- AI-generated calculations
+These were previously forbidden and are now approved as part of the platform roadmap.
+Each must land as a narrow PR with tests, disclaimers, and updated docs:
+
+- deterministic cost-basis engine: FIFO/LIFO/HIFO/ACB/weighted-average lot matching;
+- **preliminary** tax-base and tax-amount calculation (per jurisdiction, e.g. RU 13%/15%);
+- per-jurisdiction rule/rate/form modules (RU first; others as plugins);
+- server-side API route handlers (Next.js Route Handlers) for secrets and proxying;
+- external APIs for FX rates (e.g. ЦБ) and historical crypto prices (results cached by date);
+- exchange/wallet CSV adapters, read-only API connectors, blockchain address/xpub sync;
+- AI advisor — explanations and document/declaration **text drafts** only.
+
+## Forbidden Features (hard bans — never implement)
+
+- automated tax filing / submission to ФНС or any tax authority;
+- tax payment, collection, or remittance;
+- AML certification or AML scoring;
+- presenting any tax number as an official amount due (always "preliminary, for review");
+- AI/LLM-generated tax numbers or calculations (numbers come only from the deterministic engine);
+- AI/LLM logic for classification, risk rules, or audit decisions (those stay deterministic);
+- anything framed as bypassing bank, regulatory, or AML controls.
+
+## Still Gated / Out Of Default Scope
+
+- Supabase / auth / backend persistence (optional, gated, off by default — unchanged);
+- payment processing of any kind.
 
 ## Financial And Compliance Safety
 
@@ -118,11 +136,14 @@ AML conclusions, or claims that funds are clean or dirty.
 
 ## Deterministic Logic Rules
 
-- Parser, risk, scoring, and future report logic must be deterministic and reproducible.
+- Parser, risk, scoring, tax, portfolio, and report logic must be deterministic and reproducible.
 - Do not use AI or LLM logic for calculations, classification, risk rules, tax logic, or audit decisions.
-- Current PRs must not implement tax calculations unless explicitly requested in the approved brief.
-- All future tax calculator work must include methodology, tests, disclaimers, and jurisdiction scope.
-- Bad or incomplete data should produce structured warnings, errors, or review findings.
+  The AI advisor may explain results and draft text, but never produces or alters tax numbers.
+- All tax-calculator work must include methodology, tests, disclaimers, and jurisdiction scope.
+- External data (FX rates, historical prices) must be cached by date so a given result is
+  reproducible: once a rate/price for a date is fetched, it is fixed and reused.
+- Bad or incomplete data should produce structured warnings, errors, or review findings
+  (e.g. missing rate / uncovered disposal → `needs_review`), never a guessed value.
 - Do not silently drop user-provided rows.
 - Preserve raw source data where relevant for auditability.
 
@@ -131,6 +152,13 @@ AML conclusions, or claims that funds are clean or dirty.
 - Parser logic stays in `src/lib/parsers/`.
 - Risk logic stays in `src/lib/risk/`.
 - Analytics/metrics logic stays in `src/lib/metrics/` (pure, deterministic functions only).
+- Tax engine stays in `src/lib/tax/`: lots in `tax/lots/`, cost-basis methods in `tax/methods/`,
+  FX/price conversion in `tax/rates/`, per-jurisdiction rules/rates/forms in `tax/jurisdictions/<code>/`.
+  The engine core is jurisdiction-neutral; jurisdiction modules apply rates/rules/forms.
+- FX-rate and price clients stay in `src/lib/rates/` (with date-keyed caching).
+- Portfolio logic stays in `src/lib/portfolio/` (pure, deterministic; reuses `tax/lots/`).
+- Import adapters/connectors stay in `src/lib/integrations/` (normalize into `Transaction`).
+- Server-only code (secrets, external API proxying, AI advisor) stays in `app/api/*` Route Handlers.
 - Report logic stays in `src/lib/report/`.
 - Client-only storage stays in `src/lib/client/`.
 - UI components stay in `src/components/`, grouped by feature
