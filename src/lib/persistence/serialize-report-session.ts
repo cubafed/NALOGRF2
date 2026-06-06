@@ -17,6 +17,7 @@ export function serializeReportSession({
   session,
   report,
   partnerAttribution = null,
+  collectedDocumentKeys,
 }: SerializeReportSessionInput): SavedReportDraft {
   const title = session.fileName
     ? `Crypto Audit Report: ${session.fileName}`
@@ -32,5 +33,8 @@ export function serializeReportSession({
     reportPreview: report,
     partnerAttribution,
     sourceType: "local_upload",
+    ...(collectedDocumentKeys !== undefined && {
+      documentCollectionState: { collectedKeys: collectedDocumentKeys },
+    }),
   };
 }

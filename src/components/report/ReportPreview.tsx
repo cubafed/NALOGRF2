@@ -72,6 +72,7 @@ export function ReportPreview() {
         <ReportDocumentsSection
           documentsNeeded={model.documentsNeeded}
           affectedRows={model.affectedRows}
+          documentChecklist={model.documentChecklist}
         />
         <ReportQuestionsSection questions={model.generatedQuestions} />
         <ReportDisclaimer disclaimer={model.disclaimer} />

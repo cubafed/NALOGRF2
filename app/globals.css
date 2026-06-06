@@ -424,6 +424,10 @@ textarea {
   gap: 18px;
 }
 
+.print-only-inline {
+  display: none;
+}
+
 .upload-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
@@ -743,5 +747,24 @@ code {
 
   a {
     color: #111827;
+  }
+
+  .document-checklist-item {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border-color: #d9dde3 !important;
+    background: #ffffff !important;
+  }
+
+  .document-checklist-item input[type="checkbox"] {
+    display: none;
+  }
+
+  .print-only-inline {
+    display: inline !important;
+  }
+
+  .checklist-progress {
+    display: none;
   }
 }
