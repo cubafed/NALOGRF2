@@ -47,9 +47,20 @@ An `ImportSession` (transactions + warnings + errors + raw rows + risk result) i
 Crypto Audit Report helps users prepare crypto transaction history for a bank, accountant,
 tax consultant, or source-of-funds review.
 
-This is not:
+Strategic product lines include:
+
+- Crypto Tax Calculator / Tax-Readiness;
+- Bank / Source-of-Funds Audit Package;
+- Portfolio Analytics.
+
+Deterministic tax calculator modules are allowed only as future explicitly approved
+scope with methodology, jurisdiction scope, supported/unsupported operation types,
+tests, disclaimers, and excluded-from-estimate behavior.
+
+The current MVP is not:
 
 - a tax filing product;
+- a tax payment product;
 - an AML certification product;
 - a bank bypass product;
 - legal, tax, financial, or AML advice.
@@ -75,6 +86,9 @@ This is not:
 - exchange APIs
 - AML integrations
 - tax filing
+- tax payment
+- official tax due calculation
+- FIFO/LIFO gain/loss engine
 - AI-generated calculations
 
 ## Financial And Compliance Safety
@@ -106,6 +120,8 @@ AML conclusions, or claims that funds are clean or dirty.
 
 - Parser, risk, scoring, and future report logic must be deterministic and reproducible.
 - Do not use AI or LLM logic for calculations, classification, risk rules, tax logic, or audit decisions.
+- Current PRs must not implement tax calculations unless explicitly requested in the approved brief.
+- All future tax calculator work must include methodology, tests, disclaimers, and jurisdiction scope.
 - Bad or incomplete data should produce structured warnings, errors, or review findings.
 - Do not silently drop user-provided rows.
 - Preserve raw source data where relevant for auditability.

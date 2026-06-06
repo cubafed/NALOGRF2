@@ -9,6 +9,9 @@ It is a scope, safety, and validation checklist for future Codex tasks.
 - Identify the approved PR number and brief before editing.
 - Keep the PR to one narrow feature.
 - Do not add future features, routes, services, or integrations unless explicitly approved.
+- Deterministic tax calculator modules are allowed only as future explicitly approved
+  scope with methodology, jurisdiction scope, supported/unsupported operation types,
+  tests, disclaimers, and excluded-from-estimate behavior.
 
 ## Forbidden Feature Check
 
@@ -26,6 +29,9 @@ Before and after changes, verify the task did not add:
 - exchange APIs
 - AML integrations or AML checks
 - tax filing
+- tax payment
+- official tax due calculation
+- FIFO/LIFO gain/loss engine
 - AI-generated calculations
 
 ## Deterministic Logic Check
@@ -35,6 +41,8 @@ Before and after changes, verify the task did not add:
 - Business logic must not be duplicated inside React components.
 - Calculations, parsing, scoring, and rule decisions must be deterministic.
 - Do not use LLMs or AI for calculations, classification, risk findings, or tax decisions.
+- Current PRs must not implement tax calculations unless explicitly requested in the approved brief.
+- All future tax calculator work must include methodology, tests, disclaimers, and jurisdiction scope.
 - Preserve raw source data where the feature touches user-provided rows.
 
 ## Financial/Compliance Language Check

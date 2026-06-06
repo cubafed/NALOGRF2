@@ -2,6 +2,16 @@
 
 Dark fintech/compliance landing and static demo report for a future Crypto Source-of-Funds & Tax Audit product.
 
+Strategic product lines:
+
+- Crypto Tax Calculator / Tax-Readiness.
+- Bank / Source-of-Funds Audit Package.
+- Portfolio Analytics.
+
+Current tax calculator work is methodology-only. The MVP does not calculate
+official tax due, file declarations, process tax payments, or provide legal,
+tax, financial, or AML advice.
+
 Primary message:
 
 > Подготовьте криптоисторию для банка, бухгалтера и налоговой
@@ -40,6 +50,9 @@ Primary message:
 - Exchange APIs.
 - AML checks.
 - Country-specific tax filing.
+- Tax payment processing.
+- Official tax due calculation.
+- FIFO/LIFO gain/loss engine.
 - AI-generated calculations.
 
 ## Pages
@@ -107,6 +120,6 @@ The production build does not require environment variables.
 
 ## Next Planned PRs
 
-1. Add Supabase project QA with a real test project and documented manual setup.
-2. Add explicit file upload-to-storage action for authenticated users.
-3. Add saved report detail view without changing parser/risk logic.
+1. Review `docs/tax/` methodology before any future tax calculator PR.
+2. Add Supabase project QA with a real test project and documented manual setup.
+3. Add explicit file upload-to-storage action for authenticated users.
