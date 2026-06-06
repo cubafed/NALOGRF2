@@ -1,13 +1,67 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Check, Copy, FileText, ShieldCheck } from "lucide-react";
+import { Check, Copy, Download, FileText, ShieldCheck } from "lucide-react";
 import {
   loadLatestImportSession,
   type ImportSession,
 } from "@/lib/client/import-session-storage";
-import { buildSourceOfFundsPack } from "@/lib/report/source-of-funds-pack";
+import { buildSourceOfFundsPack, type SourceOfFundsPack } from "@/lib/report/source-of-funds-pack";
+import {
+  serializeSourceOfFundsPackJson,
+  serializeSourceOfFundsPackText,
+} from "@/lib/report/serialize-source-of-funds-pack";
 import { DocumentChecklist } from "./DocumentChecklist";
+
+function downloadBlob(content: string, filename: string, type: string) {
+  if (typeof window === "undefined") return;
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(url);
+}
+
+function PackExportButtons({ pack }: { pack: SourceOfFundsPack }) {
+  return (
+    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+      <button
+        type="button"
+        className="btn"
+        style={{ gap: 6, fontSize: 13 }}
+        onClick={() =>
+          downloadBlob(
+            "﻿" + serializeSourceOfFundsPackText(pack),
+            "source-of-funds-pack.md",
+            "text/markdown;charset=utf-8;",
+          )
+        }
+      >
+        <Download size={14} />
+        Документ (Markdown)
+      </button>
+      <button
+        type="button"
+        className="btn"
+        style={{ gap: 6, fontSize: 13 }}
+        onClick={() =>
+          downloadBlob(
+            serializeSourceOfFundsPackJson(pack),
+            "source-of-funds-pack.json",
+            "application/json;charset=utf-8;",
+          )
+        }
+      >
+        <Download size={14} />
+        JSON
+      </button>
+    </div>
+  );
+}
 
 function formatMoney(value: number, currency: string): string {
   return (
@@ -100,6 +154,10 @@ export function SourceOfFundsPanel() {
           запрашивает пояснения по 115-ФЗ. Сводка, документы и черновики писем собраны из вашей
           истории операций.
         </p>
+
+        <div style={{ marginTop: 14 }}>
+          <PackExportButtons pack={pack} />
+        </div>
 
         {/* Where funds came from */}
         {pack.inflowBySource.length > 0 && (
