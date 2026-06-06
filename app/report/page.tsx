@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { Calculator } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { FooterDisclaimer } from "@/components/layout/FooterDisclaimer";
 import { ReportPreview } from "@/components/report/ReportPreview";
@@ -22,6 +24,10 @@ export default function ReportPage() {
               проблем для проверки. Помогает заранее подготовить пояснения и документы для банка,
               бухгалтера или налогового консультанта.
             </p>
+            <Link href="/tax" className="btn" style={{ gap: 8, marginTop: 16, fontSize: 13 }}>
+              <Calculator size={15} />
+              Предварительная налоговая оценка
+            </Link>
           </div>
           <ReportPreview />
         </div>
