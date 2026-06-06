@@ -66,6 +66,21 @@ export function PreliminaryTaxEstimatePanel({
 }) {
   const { summary, lines } = estimate;
 
+  // Always render at least one block; never sum across currencies.
+  const currencyBlocks =
+    summary.byCurrency.length > 0
+      ? summary.byCurrency
+      : [
+          {
+            fiatCurrency: summary.fiatCurrency,
+            includedOperations: 0,
+            totalProceedsFiat: 0,
+            totalManualCostBasisFiat: 0,
+            totalFeesFiat: 0,
+            preliminaryTaxableResultFiat: 0,
+          },
+        ];
+
   const handleExport = () => {
     if (typeof window === "undefined") return;
     const csv = "﻿" + buildCsv(lines); // BOM for Excel/RU locale
@@ -122,35 +137,50 @@ export function PreliminaryTaxEstimatePanel({
           </div>
         </div>
 
-        <div className="grid-3" style={{ marginTop: 18 }}>
-          <div className="panel" style={{ background: "var(--panel-2)" }}>
-            <div className="panel-inner">
-              <p className="eyebrow">Proceeds</p>
-              <strong style={{ fontSize: 22 }}>
-                {formatMoney(summary.totalProceedsFiat, summary.fiatCurrency)}
-              </strong>
+        {summary.byCurrency.length > 1 && (
+          <p className="muted" style={{ margin: "18px 0 0", fontSize: 12 }}>
+            Несколько валют — итоги показаны отдельно по каждой валюте и не суммируются между собой.
+          </p>
+        )}
+
+        {currencyBlocks.map((block) => (
+          <div key={block.fiatCurrency} style={{ marginTop: 14 }}>
+            {summary.byCurrency.length > 1 && (
+              <p className="eyebrow" style={{ margin: "0 0 8px" }}>
+                {block.fiatCurrency} · {block.includedOperations} оп.
+              </p>
+            )}
+            <div className="grid-3">
+              <div className="panel" style={{ background: "var(--panel-2)" }}>
+                <div className="panel-inner">
+                  <p className="eyebrow">Proceeds</p>
+                  <strong style={{ fontSize: 22 }}>
+                    {formatMoney(block.totalProceedsFiat, block.fiatCurrency)}
+                  </strong>
+                </div>
+              </div>
+              <div className="panel" style={{ background: "var(--panel-2)" }}>
+                <div className="panel-inner">
+                  <p className="eyebrow">Manual cost basis + fees</p>
+                  <strong style={{ fontSize: 22 }}>
+                    {formatMoney(
+                      block.totalManualCostBasisFiat + block.totalFeesFiat,
+                      block.fiatCurrency,
+                    )}
+                  </strong>
+                </div>
+              </div>
+              <div className="panel" style={{ background: "var(--blue-soft)" }}>
+                <div className="panel-inner">
+                  <p className="eyebrow">Preliminary result</p>
+                  <strong style={{ fontSize: 22 }}>
+                    {formatMoney(block.preliminaryTaxableResultFiat, block.fiatCurrency)}
+                  </strong>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="panel" style={{ background: "var(--panel-2)" }}>
-            <div className="panel-inner">
-              <p className="eyebrow">Manual cost basis + fees</p>
-              <strong style={{ fontSize: 22 }}>
-                {formatMoney(
-                  summary.totalManualCostBasisFiat + summary.totalFeesFiat,
-                  summary.fiatCurrency,
-                )}
-              </strong>
-            </div>
-          </div>
-          <div className="panel" style={{ background: "var(--blue-soft)" }}>
-            <div className="panel-inner">
-              <p className="eyebrow">Preliminary result</p>
-              <strong style={{ fontSize: 22 }}>
-                {formatMoney(summary.preliminaryTaxableResultFiat, summary.fiatCurrency)}
-              </strong>
-            </div>
-          </div>
-        </div>
+        ))}
 
         <p className="muted" style={{ margin: "18px 0 0", fontSize: 13 }}>
           {DISCLAIMER}

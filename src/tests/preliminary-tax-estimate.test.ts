@@ -130,6 +130,30 @@ describe("calculatePreliminaryTaxEstimate", () => {
     ]);
   });
 
+  it("reports per-currency totals and a dominant currency without mixing currencies", () => {
+    const transactions = [
+      tx({ id: "usd-1", fiatValue: "1000", fiatCurrency: "USD" }),
+      tx({ id: "usd-2", fiatValue: "800", fiatCurrency: "USD" }),
+      tx({ id: "eur-1", fiatValue: "500", fiatCurrency: "EUR" }),
+    ];
+    const manual: ManualCostBasisByTransactionId = {
+      "usd-1": { transactionId: "usd-1", costBasisFiat: "600", updatedAt: "x" },
+      "usd-2": { transactionId: "usd-2", costBasisFiat: "500", updatedAt: "x" },
+      "eur-1": { transactionId: "eur-1", costBasisFiat: "300", updatedAt: "x" },
+    };
+
+    const { summary } = estimate(transactions, manual);
+
+    expect(summary.byCurrency).toHaveLength(2);
+    const usd = summary.byCurrency.find((c) => c.fiatCurrency === "USD");
+    const eur = summary.byCurrency.find((c) => c.fiatCurrency === "EUR");
+    expect(usd?.includedOperations).toBe(2);
+    expect(usd?.preliminaryTaxableResultFiat).toBe(700); // (1000-600)+(800-500)
+    expect(eur?.preliminaryTaxableResultFiat).toBe(200); // 500-300
+    // Dominant currency = the one with the most included operations.
+    expect(summary.fiatCurrency).toBe("USD");
+  });
+
   it("throws only when transactions or classifications are not arrays", () => {
     expect(() =>
       calculatePreliminaryTaxEstimate({} as unknown as Transaction[], [], {}),

@@ -48,17 +48,37 @@ export interface PreliminaryTaxEstimateLine {
   classification: TaxEventClassification;
 }
 
+/**
+ * Per-currency totals for included operations. Monetary values are never summed
+ * across currencies — each currency is reported separately.
+ */
+export interface PreliminaryTaxEstimateCurrencyTotals {
+  fiatCurrency: string;
+  includedOperations: number;
+  totalProceedsFiat: number;
+  totalManualCostBasisFiat: number;
+  totalFeesFiat: number;
+  preliminaryTaxableResultFiat: number;
+}
+
 export interface PreliminaryTaxEstimateSummary {
   totalOperations: number;
   includedOperations: number;
   excludedOperations: number;
   needsReviewOperations: number;
   taxableCandidates: number;
+  /**
+   * Flat totals. Only meaningful when all included operations share one
+   * currency; for mixed currencies use `byCurrency`. `fiatCurrency` reflects
+   * the dominant currency (most included operations).
+   */
   totalProceedsFiat: number;
   totalManualCostBasisFiat: number;
   totalFeesFiat: number;
   preliminaryTaxableResultFiat: number;
   fiatCurrency: string;
+  /** Per-currency totals; never mixes currencies. */
+  byCurrency: PreliminaryTaxEstimateCurrencyTotals[];
 }
 
 export interface PreliminaryTaxEstimate {

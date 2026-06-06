@@ -3,10 +3,10 @@ import {
   buildTaxSummaryExport,
   serializeTaxSummaryCsv,
 } from "@/lib/tax/build-tax-summary-export";
+import { buildTaxEstimateSummary } from "@/lib/tax/build-tax-estimate-summary";
 import type {
   PreliminaryTaxEstimate,
   PreliminaryTaxEstimateLine,
-  PreliminaryTaxEstimateSummary,
 } from "@/lib/tax/manual-cost-basis-types";
 
 function line(overrides: Partial<PreliminaryTaxEstimateLine>): PreliminaryTaxEstimateLine {
@@ -43,19 +43,8 @@ function line(overrides: Partial<PreliminaryTaxEstimateLine>): PreliminaryTaxEst
 }
 
 function estimateOf(lines: PreliminaryTaxEstimateLine[]): PreliminaryTaxEstimate {
-  const summary: PreliminaryTaxEstimateSummary = {
-    totalOperations: lines.length,
-    includedOperations: lines.filter((l) => l.status === "included").length,
-    excludedOperations: lines.filter((l) => l.status === "excluded").length,
-    needsReviewOperations: lines.filter((l) => l.status === "needs_review").length,
-    taxableCandidates: lines.filter((l) => l.classificationCategory === "taxable_candidate").length,
-    totalProceedsFiat: 1000,
-    totalManualCostBasisFiat: 600,
-    totalFeesFiat: 10,
-    preliminaryTaxableResultFiat: 390,
-    fiatCurrency: "USD",
-  };
-  return { lines, summary };
+  // Use the real summary builder so byCurrency and totals stay consistent.
+  return { lines, summary: buildTaxEstimateSummary(lines) };
 }
 
 describe("buildTaxSummaryExport", () => {
@@ -120,6 +109,21 @@ describe("buildTaxSummaryExport", () => {
       taxYear: 2023,
     });
     expect(result.taxYear).toBe(2023);
+  });
+
+  it("reports per-currency totals without mixing currencies", () => {
+    const result = buildTaxSummaryExport(
+      estimateOf([
+        line({ transactionId: "a", fiatCurrency: "USD", preliminaryTaxableResultFiat: 390 }),
+        line({ transactionId: "b", fiatCurrency: "EUR", preliminaryTaxableResultFiat: 200 }),
+      ]),
+      { generatedAt: "x" },
+    );
+    expect(result.byCurrency).toHaveLength(2);
+    const usd = result.byCurrency.find((c) => c.fiatCurrency === "USD");
+    const eur = result.byCurrency.find((c) => c.fiatCurrency === "EUR");
+    expect(usd?.preliminaryTaxableResultFiat).toBe(390);
+    expect(eur?.preliminaryTaxableResultFiat).toBe(200);
   });
 });
 

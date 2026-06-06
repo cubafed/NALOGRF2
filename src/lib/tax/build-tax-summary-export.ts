@@ -69,6 +69,7 @@ export function buildTaxSummaryExport(
     generatedAt: options.generatedAt ?? new Date().toISOString(),
     taxYear,
     fiatCurrency: summary.fiatCurrency,
+    byCurrency: summary.byCurrency,
     totals: {
       totalOperations: summary.totalOperations,
       includedOperations: summary.includedOperations,
