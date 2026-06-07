@@ -28,7 +28,8 @@ Framer Motion (animations) · Recharts (charts) · Lucide React (icons) · Vites
 
 **Library modules (`src/lib/`):**
 
-- `parsers/` — `universal-csv-parser.ts` (canonical headers: date, type, asset, amount + optional fields). Produces transactions, warnings, errors, raw rows.
+- `parsers/` — `universal-csv-parser.ts` (canonical headers: date, type, asset, amount + optional fields) + shared `csv-tokenizer.ts` (RFC-4180 tokenize + header→value objects). Produces transactions, warnings, errors, raw rows.
+- `integrations/` — exchange CSV adapters (`adapters/binance.ts`, `adapters/bybit.ts`) normalizing into canonical rows, `registry.ts` (auto-detect by signature headers), `import-exchange-csv.ts` (detect → map → dedup → reuse `parseUniversalCsv`).
 - `risk/` — deterministic engine: 9 rules in `risk-rules.ts` (incl. 3 RU bank-trigger rules: rapid_transit, concentrated_counterparty, high_p2p_share), readiness score, `run-risk-engine.ts`.
 - `metrics/` — pure analytics functions: fiat flow, data completeness, source coverage, monthly activity.
 - `report/` — report preview, document checklist/catalog, derived questions, export filename, source-of-funds pack (`source-of-funds-pack.ts`, `serialize-source-of-funds-pack.ts`, `explanation-letter-templates.ts`).
