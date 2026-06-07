@@ -85,7 +85,7 @@ describe("method registry", () => {
 
   it("getCostBasisMethod resolves known ids and rejects unknown", () => {
     expect(getCostBasisMethod("lifo")).toBe(lifoMethod);
-    expect(getCostBasisMethod("acb")).toBeNull();
+    expect(getCostBasisMethod("weighted-average")).toBeNull();
   });
 });
 
