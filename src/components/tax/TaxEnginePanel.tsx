@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AlertTriangle, Calculator, CheckCircle, Download, RefreshCw } from "lucide-react";
+import { AlertTriangle, Calculator, CheckCircle, Download, FileText, RefreshCw } from "lucide-react";
 import {
   loadLatestImportSession,
   type ImportSession,
@@ -16,6 +16,20 @@ import { calculateTax } from "@/lib/tax/engine/calculate-tax";
 import { createRateLookup, type RateTableEntry } from "@/lib/tax/rates/convert";
 import { fetchRatesForTransactions } from "@/lib/rates/fetch-rates-for-transactions";
 import type { TaxEngineResult } from "@/lib/tax/engine/engine-types";
+import { serializeTaxResultText, serializeTaxResultJson } from "@/lib/tax/serialize-tax-result";
+
+function downloadBlob(content: string, filename: string, type: string) {
+  if (typeof window === "undefined") return;
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 const METHOD_OPTIONS: { id: CostBasisMethodId; label: string }[] = [
   { id: "fifo", label: "FIFO (первый вошёл — первый вышел)" },
@@ -404,6 +418,49 @@ export function TaxEnginePanel() {
                   </tbody>
                 </table>
               </div>
+            </div>
+
+            {/* Export */}
+            <div style={{ marginTop: 16, display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button
+                type="button"
+                className="btn"
+                style={{ gap: 6, fontSize: 13 }}
+                onClick={() =>
+                  downloadBlob(
+                    "﻿" + serializeTaxResultText(result, new Date().toISOString()),
+                    "tax-calculation.md",
+                    "text/markdown;charset=utf-8;",
+                  )
+                }
+              >
+                <FileText size={13} />
+                Экспорт Markdown
+              </button>
+              <button
+                type="button"
+                className="btn"
+                style={{ gap: 6, fontSize: 13 }}
+                onClick={() =>
+                  downloadBlob(
+                    serializeTaxResultJson(result, new Date().toISOString()),
+                    "tax-calculation.json",
+                    "application/json;charset=utf-8;",
+                  )
+                }
+              >
+                <Download size={13} />
+                Экспорт JSON
+              </button>
+              <button
+                type="button"
+                className="btn"
+                style={{ gap: 6, fontSize: 13 }}
+                onClick={() => window.print()}
+              >
+                <Download size={13} />
+                Печать / PDF
+              </button>
             </div>
 
             <p className="muted" style={{ marginTop: 14, fontSize: 12 }}>

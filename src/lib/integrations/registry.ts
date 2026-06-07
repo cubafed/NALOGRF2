@@ -1,9 +1,18 @@
 import type { ExchangeAdapter } from "@/lib/integrations/integration-types";
 import { binanceAdapter } from "@/lib/integrations/adapters/binance";
 import { bybitAdapter } from "@/lib/integrations/adapters/bybit";
+import { okxAdapter } from "@/lib/integrations/adapters/okx";
+import { kucoinAdapter } from "@/lib/integrations/adapters/kucoin";
+import { krakenAdapter } from "@/lib/integrations/adapters/kraken";
 
 /** All registered exchange CSV adapters. Add new adapters here to make them available. */
-export const exchangeAdapters: ExchangeAdapter[] = [binanceAdapter, bybitAdapter];
+export const exchangeAdapters: ExchangeAdapter[] = [
+  binanceAdapter,
+  bybitAdapter,
+  okxAdapter,
+  kucoinAdapter,
+  krakenAdapter,
+];
 
 /** Look up an adapter by its stable id (e.g. "binance"). */
 export function getAdapterById(id: string): ExchangeAdapter | null {

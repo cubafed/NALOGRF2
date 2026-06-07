@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { href: "/problems", label: "Проблемы" },
   { href: "/tax", label: "Налог" },
   { href: "/report", label: "Отчет" },
+  { href: "/account", label: "Аккаунт" },
   { href: "/partners", label: "Партнерам" },
 ];
 
