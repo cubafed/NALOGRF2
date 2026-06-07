@@ -23,19 +23,23 @@ Framer Motion (animations) · Recharts (charts) · Lucide React (icons) · Vites
 | `/saved-reports` | Saved-report list (local service; Supabase variant gated/optional) |
 | `/account` | Auth status (optional Supabase foundation) |
 | `/partners` | Static partner pages + local attribution |
+| `/api/rates/cbr` | Route Handler: CBR daily FX rates → JSON; in-memory date-keyed cache |
+| `/api/prices` | Route Handler: CoinGecko historical crypto prices → JSON; in-memory cache |
 
 **Library modules (`src/lib/`):**
 
 - `parsers/` — `universal-csv-parser.ts` (canonical headers: date, type, asset, amount + optional fields). Produces transactions, warnings, errors, raw rows.
-- `risk/` — deterministic engine: 6 rules in `risk-rules.ts`, readiness score, `run-risk-engine.ts`.
+- `risk/` — deterministic engine: 9 rules in `risk-rules.ts` (incl. 3 RU bank-trigger rules: rapid_transit, concentrated_counterparty, high_p2p_share), readiness score, `run-risk-engine.ts`.
 - `metrics/` — pure analytics functions: fiat flow, data completeness, source coverage, monthly activity.
-- `report/` — report preview, document checklist/catalog, derived questions, export filename.
+- `report/` — report preview, document checklist/catalog, derived questions, export filename, source-of-funds pack (`source-of-funds-pack.ts`, `serialize-source-of-funds-pack.ts`, `explanation-letter-templates.ts`).
 - `client/` — browser storage helpers (import session, document checklist, partner attribution). Currently `sessionStorage`.
 - `persistence/` — saved-report service (local + Supabase variant) + serialization.
 - `supabase/` — optional client/server/config (gated, off by default).
 - `partners/` — partner attribution logic.
 - `demo/` — sample CSV + demo report fixtures.
 - `domain/` — shared types (`Transaction`, `TransactionType`, `Finding`, `Report`, etc.).
+- `tax/` — deterministic tax engine: `engine/` (types + `calculate-tax.ts`), `lots/` (FIFO lot builder), `methods/` (fifo cost-basis method), `rates/` (`convert.ts` with `createRateLookup`), `jurisdictions/ru/` (13%/15% NDFL brackets). Engine is jurisdiction-neutral; RU module is the first implementation.
+- `rates/` — browser clients for external rate/price APIs: `cbr-client.ts` (calls `/api/rates/cbr`), `prices-client.ts` (calls `/api/prices`), `cbr-xml-parser.ts` (pure CBR XML → RateTableEntry[]).
 
 **State model:** all user data lives client-side only (no backend persistence by default).
 An `ImportSession` (transactions + warnings + errors + raw rows + risk result) is the central object.
