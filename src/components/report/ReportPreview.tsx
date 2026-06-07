@@ -16,6 +16,8 @@ import { ReportQuestionsSection } from "./ReportQuestionsSection";
 import { ReportDisclaimer } from "./ReportDisclaimer";
 import { ReportEmptyState } from "./ReportEmptyState";
 import { ReportPrintActions } from "./ReportPrintActions";
+import { TaxSummaryReferenceCard } from "./TaxSummaryReferenceCard";
+import { SourceOfFundsPanel } from "./SourceOfFundsPanel";
 import { SaveReportPanel } from "@/components/persistence/SaveReportPanel";
 
 export function ReportPreview() {
@@ -74,6 +76,8 @@ export function ReportPreview() {
           affectedRows={model.affectedRows}
           documentChecklist={model.documentChecklist}
         />
+        <SourceOfFundsPanel />
+        <TaxSummaryReferenceCard />
         <ReportQuestionsSection questions={model.generatedQuestions} />
         <ReportDisclaimer disclaimer={model.disclaimer} />
       </div>

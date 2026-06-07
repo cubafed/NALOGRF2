@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "/upload", label: "Загрузить" },
   { href: "/dashboard", label: "Аналитика" },
   { href: "/problems", label: "Проблемы" },
+  { href: "/tax", label: "Налог" },
   { href: "/report", label: "Отчет" },
   { href: "/partners", label: "Партнерам" },
 ];

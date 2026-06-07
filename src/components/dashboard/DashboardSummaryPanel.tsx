@@ -1,14 +1,19 @@
 "use client";
 
-import { TrendingUp, TrendingDown, Activity, CheckCircle2 } from "lucide-react";
+import { TrendingUp, TrendingDown, Activity, CheckCircle2, Coins, Layers, Scale } from "lucide-react";
 import { StatCard } from "@/components/ui/StatCard";
-import type { FiatFlowResult, DataCompletenessResult } from "@/lib/metrics/analytics-types";
+import type {
+  FiatFlowResult,
+  DataCompletenessResult,
+  SourceCoverageResult,
+} from "@/lib/metrics/analytics-types";
 import type { ImportSession } from "@/lib/client/import-session-storage";
 
 interface DashboardSummaryPanelProps {
   session: ImportSession;
   fiatFlow: FiatFlowResult;
   completeness: DataCompletenessResult;
+  sourceCoverage: SourceCoverageResult;
 }
 
 function formatFiat(v: number): string {
@@ -19,6 +24,7 @@ export function DashboardSummaryPanel({
   session,
   fiatFlow,
   completeness,
+  sourceCoverage,
 }: DashboardSummaryPanelProps) {
   const totalTx = session.parserSummary.transactionCount;
 
@@ -26,15 +32,22 @@ export function DashboardSummaryPanel({
   const extraCurrencies = fiatFlow.byCurrency.length - 1;
   const inflowValue = dominantCurrency?.totalInflow ?? 0;
   const outflowValue = dominantCurrency?.totalOutflow ?? 0;
+  const netValue = dominantCurrency?.netFlow ?? 0;
   const currencyLabel = dominantCurrency
     ? extraCurrencies > 0
       ? `${dominantCurrency.currency} (+${extraCurrencies} вал.)`
       : dominantCurrency.currency
     : "—";
 
+  const distinctAssets = new Set(
+    session.transactions.map((t) => (t.asset ?? "").trim().toUpperCase()).filter(Boolean),
+  ).size;
+  const distinctSources = sourceCoverage.entries.length;
+
   const completePct = completeness.completenessPercent;
   const completenessColor =
     completePct >= 90 ? "var(--green)" : completePct >= 70 ? "var(--amber)" : "var(--red)";
+  const netColor = netValue >= 0 ? "var(--green)" : "var(--red)";
 
   return (
     <section className="panel">
@@ -66,6 +79,25 @@ export function DashboardSummaryPanel({
             iconBg="rgba(26,130,255,0.12)"
             value={totalTx}
             label="Транзакций"
+          />
+          <StatCard
+            icon={<Scale size={16} color={netColor} />}
+            iconBg="rgba(26,130,255,0.12)"
+            value={netValue}
+            label={`Чистый поток · ${currencyLabel}`}
+            valueColor={netColor}
+          />
+          <StatCard
+            icon={<Coins size={16} color="var(--blue)" />}
+            iconBg="rgba(26,130,255,0.12)"
+            value={distinctAssets}
+            label="Активов"
+          />
+          <StatCard
+            icon={<Layers size={16} color="var(--blue)" />}
+            iconBg="rgba(26,130,255,0.12)"
+            value={distinctSources}
+            label="Источников"
           />
           <StatCard
             icon={<CheckCircle2 size={16} color={completenessColor} />}

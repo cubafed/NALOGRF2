@@ -1,5 +1,6 @@
 import { AuthStatus } from "@/components/auth/AuthStatus";
 import { SignInPanel } from "@/components/auth/SignInPanel";
+import { JurisdictionSelector } from "@/components/account/JurisdictionSelector";
 import { FooterDisclaimer } from "@/components/layout/FooterDisclaimer";
 import { Header } from "@/components/layout/Header";
 import { SupabaseUnavailableNotice } from "@/components/persistence/SupabaseUnavailableNotice";
@@ -31,6 +32,21 @@ export default function AccountPage() {
             </div>
 
             <div className="upload-stack">
+              <section className="panel">
+                <div className="panel-inner">
+                  <div className="panel-head">
+                    <div>
+                      <p className="eyebrow" style={{ margin: 0 }}>Налоговый профиль</p>
+                      <h2 style={{ margin: 0 }}>Юрисдикция</h2>
+                    </div>
+                  </div>
+                  <p className="muted" style={{ margin: "8px 0 14px", fontSize: 13, maxWidth: 680 }}>
+                    Определяет ставки и валюту предварительного расчёта. Хранится локально в
+                    браузере. Результат всегда предварительный, для проверки с бухгалтером.
+                  </p>
+                  <JurisdictionSelector />
+                </div>
+              </section>
               <section className="panel">
                 <div className="panel-inner">
                   <div className="panel-head">

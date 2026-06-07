@@ -5,6 +5,13 @@ export interface RiskEngineOptions {
   criticalP2pInflowThreshold?: number;
   largeFiatWithdrawalThreshold?: number;
   criticalFiatWithdrawalThreshold?: number;
+  /** RU bank-trigger rules (115-ФЗ context). */
+  rapidTransitWindowDays?: number;
+  rapidTransitThreshold?: number;
+  concentratedCounterpartyVolumeThreshold?: number;
+  concentratedCounterpartyCountThreshold?: number;
+  highP2pShareRatio?: number;
+  highP2pShareMinVolume?: number;
 }
 
 export type ReadinessLabel = "good" | "needs_review" | "high_risk";

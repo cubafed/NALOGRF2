@@ -214,3 +214,73 @@ describe("runRiskEngine", () => {
     );
   });
 });
+
+describe("RU bank-trigger rules (115-ФЗ context)", () => {
+  it("triggers rapid_transit for a large deposit followed by a withdrawal within the window", () => {
+    const result = runRiskEngine([
+      tx({ id: "in-1", type: "deposit", asset: "USDT", fiatValue: "6000", fiatCurrency: "USD", timestamp: "2024-03-01" }),
+      tx({ id: "out-1", type: "withdrawal", asset: "USDT", fiatValue: "6000", fiatCurrency: "USD", timestamp: "2024-03-02" }),
+    ]);
+    const finding = result.findings.find((f) => f.ruleId === "rapid_transit");
+    expect(finding?.severity).toBe("medium");
+    expect(finding?.affectedTransactionIds).toEqual(expect.arrayContaining(["in-1", "out-1"]));
+  });
+
+  it("does not trigger rapid_transit when the withdrawal is outside the window", () => {
+    const result = runRiskEngine([
+      tx({ id: "in-1", type: "deposit", fiatValue: "6000", fiatCurrency: "USD", timestamp: "2024-03-01" }),
+      tx({ id: "out-1", type: "withdrawal", fiatValue: "6000", fiatCurrency: "USD", timestamp: "2024-03-10" }),
+    ]);
+    expect(result.findings.some((f) => f.ruleId === "rapid_transit")).toBe(false);
+  });
+
+  it("does not mix currencies when matching rapid_transit", () => {
+    const result = runRiskEngine([
+      tx({ id: "in-1", type: "deposit", fiatValue: "6000", fiatCurrency: "USD", timestamp: "2024-03-01" }),
+      tx({ id: "out-1", type: "withdrawal", fiatValue: "6000", fiatCurrency: "EUR", timestamp: "2024-03-02" }),
+    ]);
+    expect(result.findings.some((f) => f.ruleId === "rapid_transit")).toBe(false);
+  });
+
+  it("triggers concentrated_counterparty by operation count", () => {
+    const ops = Array.from({ length: 5 }, (_, i) =>
+      tx({ id: `c-${i}`, type: "p2p", fiatValue: "100", fiatCurrency: "USD", counterparty: "Ivan P." }),
+    );
+    const result = runRiskEngine(ops);
+    const finding = result.findings.find((f) => f.ruleId === "concentrated_counterparty");
+    expect(finding?.severity).toBe("medium");
+    expect(finding?.affectedTransactionIds).toHaveLength(5);
+  });
+
+  it("triggers concentrated_counterparty by volume", () => {
+    const result = runRiskEngine([
+      tx({ id: "c-1", type: "p2p", fiatValue: "12000", fiatCurrency: "USD", counterparty: "Acme LLC" }),
+    ]);
+    expect(result.findings.some((f) => f.ruleId === "concentrated_counterparty")).toBe(true);
+  });
+
+  it("does not trigger concentrated_counterparty below thresholds or without counterparty", () => {
+    const result = runRiskEngine([
+      tx({ id: "c-1", type: "p2p", fiatValue: "100", fiatCurrency: "USD", counterparty: "" }),
+      tx({ id: "c-2", type: "p2p", fiatValue: "100", fiatCurrency: "USD", counterparty: "Solo" }),
+    ]);
+    expect(result.findings.some((f) => f.ruleId === "concentrated_counterparty")).toBe(false);
+  });
+
+  it("triggers high_p2p_share when P2P dominates inflow above the minimum volume", () => {
+    const result = runRiskEngine([
+      tx({ id: "p2p-1", type: "p2p", fiatValue: "6000", fiatCurrency: "USD", counterparty: "A" }),
+      tx({ id: "buy-fiat", type: "deposit", fiatValue: "1000", fiatCurrency: "USD" }),
+    ]);
+    const finding = result.findings.find((f) => f.ruleId === "high_p2p_share");
+    expect(finding?.severity).toBe("low");
+    expect(finding?.affectedTransactionIds).toEqual(["p2p-1"]);
+  });
+
+  it("does not trigger high_p2p_share when P2P volume is below the minimum", () => {
+    const result = runRiskEngine([
+      tx({ id: "p2p-1", type: "p2p", fiatValue: "1000", fiatCurrency: "USD" }),
+    ]);
+    expect(result.findings.some((f) => f.ruleId === "high_p2p_share")).toBe(false);
+  });
+});

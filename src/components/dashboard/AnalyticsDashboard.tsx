@@ -8,13 +8,18 @@ import { calculateFiatFlow } from "@/lib/metrics/calculate-fiat-flow";
 import { calculateDataCompleteness } from "@/lib/metrics/calculate-data-completeness";
 import { calculateSourceCoverage } from "@/lib/metrics/calculate-source-coverage";
 import { calculateMonthlyActivity } from "@/lib/metrics/calculate-monthly-activity";
+import { loadJurisdictionPreference } from "@/lib/client/jurisdiction-preference-storage";
+import { getJurisdictionInfo } from "@/lib/tax/jurisdictions";
 import { SkeletonCard } from "@/components/ui/SkeletonCard";
 import { DashboardEmptyState } from "./DashboardEmptyState";
 import { DashboardSummaryPanel } from "./DashboardSummaryPanel";
 import { FiatInflowOutflowChart } from "./FiatInflowOutflowChart";
+import { FiatFlowTrendChart } from "./FiatFlowTrendChart";
 import { DataCompletenessChart } from "./DataCompletenessChart";
 import { SourceCoverageChart } from "./SourceCoverageChart";
+import { SourceDistributionChart } from "./SourceDistributionChart";
 import { TransactionActivityChart } from "./TransactionActivityChart";
+import { PortfolioAnalyticsSection } from "./PortfolioAnalyticsSection";
 
 export function AnalyticsDashboard() {
   const [session, setSession] = useState<ImportSession | null | "loading">("loading");
@@ -50,6 +55,8 @@ export function AnalyticsDashboard() {
     parserErrors: session.parserErrors,
   });
   const monthlyActivity = calculateMonthlyActivity(session.transactions);
+  const reportCurrency =
+    getJurisdictionInfo(loadJurisdictionPreference())?.reportCurrency ?? "RUB";
 
   return (
     <motion.div
@@ -61,16 +68,26 @@ export function AnalyticsDashboard() {
         session={session}
         fiatFlow={fiatFlow}
         completeness={completeness}
+        sourceCoverage={sourceCoverage}
       />
 
       <div style={{ height: 18 }} />
 
       <div className="dashboard-grid">
         <FiatInflowOutflowChart result={fiatFlow} />
-        <DataCompletenessChart result={completeness} />
+        <FiatFlowTrendChart result={fiatFlow} />
+        <SourceDistributionChart result={sourceCoverage} />
         <TransactionActivityChart result={monthlyActivity} />
+        <DataCompletenessChart result={completeness} />
         <SourceCoverageChart result={sourceCoverage} />
       </div>
+
+      <div style={{ height: 18 }} />
+
+      <PortfolioAnalyticsSection
+        transactions={session.transactions}
+        reportCurrency={reportCurrency}
+      />
 
       <p
         style={{
