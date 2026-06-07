@@ -1,4 +1,5 @@
 import { CsvUploadPanel } from "@/components/upload/CsvUploadPanel";
+import { JurisdictionOnboarding } from "@/components/upload/JurisdictionOnboarding";
 import { FooterDisclaimer } from "@/components/layout/FooterDisclaimer";
 import { Header } from "@/components/layout/Header";
 
@@ -19,6 +20,7 @@ export default function UploadPage() {
                 и не отправляются на сервер.
               </p>
             </div>
+            <JurisdictionOnboarding />
             <CsvUploadPanel />
           </div>
         </section>

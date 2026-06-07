@@ -39,9 +39,20 @@ function applyBrackets(
   return { taxAmountReport: tax, appliedBrackets: applied };
 }
 
-/** Russia (RU) — RUB report currency, progressive NDFL. Output is preliminary, for review. */
-export const ruJurisdiction: JurisdictionModule = {
-  code: "ru",
+/**
+ * Flat NDFL rate for RU tax non-residents on this income type — a configurable, documented
+ * assumption for the preliminary estimate; confirm against current law for the relevant year.
+ */
+export const RU_NON_RESIDENT_BRACKETS: ReadonlyArray<{ upTo: number | null; rate: number }> = [
+  { upTo: null, rate: 0.3 },
+];
+
+/**
+ * Russia, tax resident — RUB report currency, progressive NDFL (13% then 15% above 5M RUB).
+ * Output is preliminary, for review with an accountant — never an official amount due.
+ */
+export const ruResidentJurisdiction: JurisdictionModule = {
+  code: "ru_resident",
   reportCurrency: "RUB",
   locale: "ru-RU",
   computeTax(taxableBaseReport) {
@@ -51,3 +62,22 @@ export const ruJurisdiction: JurisdictionModule = {
     return applyBrackets(taxableBaseReport, RU_TAX_BRACKETS);
   },
 };
+
+/**
+ * Russia, tax non-resident — RUB report currency, flat 30% NDFL on this income type.
+ * Output is preliminary, for review with an accountant — never an official amount due.
+ */
+export const ruNonResidentJurisdiction: JurisdictionModule = {
+  code: "ru_nonresident",
+  reportCurrency: "RUB",
+  locale: "ru-RU",
+  computeTax(taxableBaseReport) {
+    if (!Number.isFinite(taxableBaseReport) || taxableBaseReport <= 0) {
+      return { taxAmountReport: 0, appliedBrackets: [] };
+    }
+    return applyBrackets(taxableBaseReport, RU_NON_RESIDENT_BRACKETS);
+  },
+};
+
+/** Backwards-compatible alias: the default RU jurisdiction is the resident profile. */
+export const ruJurisdiction: JurisdictionModule = ruResidentJurisdiction;
