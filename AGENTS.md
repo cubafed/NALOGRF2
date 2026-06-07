@@ -25,6 +25,7 @@ Framer Motion (animations) · Recharts (charts) · Lucide React (icons) · Vites
 | `/partners` | Static partner pages + local attribution |
 | `/api/rates/cbr` | Route Handler: CBR daily FX rates → JSON; in-memory date-keyed cache |
 | `/api/prices` | Route Handler: CoinGecko historical crypto prices → JSON; in-memory cache |
+| `/api/assistant` | Route Handler: AI advisor (Claude API, server key); streams text; explains/drafts only, never computes tax numbers |
 
 **Library modules (`src/lib/`):**
 
@@ -41,6 +42,7 @@ Framer Motion (animations) · Recharts (charts) · Lucide React (icons) · Vites
 - `domain/` — shared types (`Transaction`, `TransactionType`, `Finding`, `Report`, etc.).
 - `tax/` — deterministic tax engine: `engine/` (types, `calculate-tax.ts`, `build-disposals.ts`), `lots/` (FIFO lot builder), `methods/` (fifo cost-basis method), `rates/` (`convert.ts` with `createRateLookup`), `jurisdictions/ru/` (13%/15% NDFL brackets). Engine is jurisdiction-neutral; RU module is the first implementation.
 - `portfolio/` — pure portfolio view: `calculate-portfolio.ts` (holdings, valuation, realized/unrealized P&L). Reuses `tax/lots/`, `tax/engine/build-disposals.ts`, and FIFO; withdrawals/transfers are not disposals.
+- `assistant/` — AI advisor support: `build-assistant-context.ts` (deterministic snapshot → context + `summarizeFindings`), `assistant-guardrails.ts` (system prompt + request assembly; AI never computes tax numbers), `assistant-client.ts` (browser streaming client). The server route is `app/api/assistant/route.ts`.
 - `rates/` — browser clients for external rate/price APIs: `cbr-client.ts` (calls `/api/rates/cbr`), `prices-client.ts` (calls `/api/prices`), `cbr-xml-parser.ts` (pure CBR XML → RateTableEntry[]).
 
 **State model:** all user data lives client-side only (no backend persistence by default).

@@ -1,6 +1,7 @@
 import { FooterDisclaimer } from "@/components/layout/FooterDisclaimer";
 import { Header } from "@/components/layout/Header";
 import { ManualCostBasisPanel } from "@/components/tax/ManualCostBasisPanel";
+import { AssistantPanel } from "@/components/assistant/AssistantPanel";
 
 export const metadata = {
   title: "Предварительная налоговая оценка — Crypto Audit Report",
@@ -26,6 +27,9 @@ export default function TaxPage() {
               </p>
             </div>
             <ManualCostBasisPanel />
+            <div style={{ marginTop: 24 }}>
+              <AssistantPanel />
+            </div>
           </div>
         </section>
       </main>
