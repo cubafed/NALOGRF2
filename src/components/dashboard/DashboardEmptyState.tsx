@@ -97,6 +97,7 @@ export function DashboardEmptyState() {
         session={demoSession}
         fiatFlow={demoFiatFlow}
         completeness={demoCompleteness}
+        sourceCoverage={demoSourceCoverage}
       />
 
       <div style={{ height: 18 }} />
