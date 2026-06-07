@@ -3,8 +3,11 @@ import type { RiskFinding } from "@/lib/risk/risk-types";
 import { buildDocumentChecklist } from "@/lib/report/build-document-checklist";
 import type { DocumentChecklistItem } from "@/lib/report/document-checklist-types";
 import {
+  buildBankCoverLetter,
+  buildConcentratedCounterpartyLetter,
   buildLargeDisposalLetter,
   buildP2pNatureLetter,
+  buildRapidTransitLetter,
   buildSourceOfFundsLetter,
   buildWalletOwnershipLetter,
   type ExplanationLetterTemplate,
@@ -55,10 +58,25 @@ export interface SourceOfFundsExplanationItem {
   operationCount: number;
 }
 
+/** Count of operations of one transaction type (for the operations summary). */
+export interface OperationsSummaryByType {
+  type: string;
+  count: number;
+}
+
+/** Deterministic overview of the operations in the package (counts + inflow + period). */
+export interface OperationsSummary {
+  totalOperations: number;
+  byType: OperationsSummaryByType[];
+  inflowBySource: SourceOfFundsInflow[];
+  periodLabel: string;
+}
+
 export interface SourceOfFundsPack {
   generatedAt: string;
   periodLabel: string;
   inflowBySource: SourceOfFundsInflow[];
+  operationsSummary: OperationsSummary;
   itemsThatMayNeedExplanation: SourceOfFundsExplanationItem[];
   documentChecklist: DocumentChecklistItem[];
   letterTemplates: ExplanationLetterTemplate[];
@@ -122,6 +140,28 @@ function buildInflowBySource(transactions: readonly Transaction[]): SourceOfFund
   );
 }
 
+function buildOperationsSummary(
+  transactions: readonly Transaction[],
+  inflowBySource: SourceOfFundsInflow[],
+  periodLabel: string,
+): OperationsSummary {
+  const counts = new Map<string, number>();
+  for (const transaction of transactions) {
+    const type = (transaction.type ?? "unknown").trim() || "unknown";
+    counts.set(type, (counts.get(type) ?? 0) + 1);
+  }
+  const byType = [...counts.entries()]
+    .map(([type, count]) => ({ type, count }))
+    .sort((a, b) => b.count - a.count || a.type.localeCompare(b.type));
+
+  return {
+    totalOperations: transactions.length,
+    byType,
+    inflowBySource,
+    periodLabel,
+  };
+}
+
 /**
  * Build a deterministic source-of-funds package from transactions and existing risk
  * findings. Reuses the document checklist and the deterministic risk findings — it does
@@ -165,6 +205,8 @@ export function buildSourceOfFundsPack(
       .filter((f) => f.ruleId === ruleId)
       .reduce((sum, f) => sum + f.affectedTransactionIds.length, 0);
 
+  const documentChecklist = buildDocumentChecklist(relevantFindings);
+
   const context: LetterContext = {
     periodLabel,
     sources: [...new Set(inflowBySource.map((inflow) => inflow.source))],
@@ -174,22 +216,32 @@ export function buildSourceOfFundsPack(
           inflow.totalInflow,
         )} ${inflow.currency} (${inflow.operationCount} оп.)`,
     ),
-    p2pCount: countForRule("large_p2p_inflow"),
+    p2pCount: countForRule("large_p2p_inflow") + countForRule("high_p2p_share"),
     unknownSourceCount: countForRule("unknown_source_wallet"),
     largeDisposalCount: countForRule("large_fiat_withdrawal"),
+    rapidTransitCount: countForRule("rapid_transit"),
+    concentratedCounterpartyCount: countForRule("concentrated_counterparty"),
+    attachedDocuments: documentChecklist.map((doc) => doc.ru),
   };
 
   const letterTemplates: ExplanationLetterTemplate[] = [buildSourceOfFundsLetter(context)];
+  // Cover letter is included whenever there is anything that may need explanation.
+  if (itemsThatMayNeedExplanation.length > 0) letterTemplates.push(buildBankCoverLetter(context));
   if (hasRule("unknown_source_wallet")) letterTemplates.push(buildWalletOwnershipLetter(context));
-  if (hasRule("large_p2p_inflow")) letterTemplates.push(buildP2pNatureLetter(context));
+  if (hasRule("large_p2p_inflow") || hasRule("high_p2p_share"))
+    letterTemplates.push(buildP2pNatureLetter(context));
+  if (hasRule("rapid_transit")) letterTemplates.push(buildRapidTransitLetter(context));
+  if (hasRule("concentrated_counterparty"))
+    letterTemplates.push(buildConcentratedCounterpartyLetter(context));
   if (hasRule("large_fiat_withdrawal")) letterTemplates.push(buildLargeDisposalLetter(context));
 
   return {
     generatedAt: options.generatedAt ?? new Date().toISOString(),
     periodLabel,
     inflowBySource,
+    operationsSummary: buildOperationsSummary(transactions, inflowBySource, periodLabel),
     itemsThatMayNeedExplanation,
-    documentChecklist: buildDocumentChecklist(relevantFindings),
+    documentChecklist,
     letterTemplates,
     disclaimer: SOURCE_OF_FUNDS_DISCLAIMER,
   };

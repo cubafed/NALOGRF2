@@ -159,6 +159,23 @@ export function SourceOfFundsPanel() {
           <PackExportButtons pack={pack} />
         </div>
 
+        {/* Operations summary */}
+        <div style={{ marginTop: 18 }}>
+          <p className="eyebrow" style={{ margin: "0 0 8px" }}>Сводка операций</p>
+          <p className="muted" style={{ margin: "0 0 8px", fontSize: 13 }}>
+            Всего операций: {pack.operationsSummary.totalOperations}
+          </p>
+          {pack.operationsSummary.byType.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {pack.operationsSummary.byType.map((row) => (
+                <span key={row.type} className="badge" style={{ fontSize: 12 }}>
+                  {row.type}: {row.count}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Where funds came from */}
         {pack.inflowBySource.length > 0 && (
           <div style={{ marginTop: 18 }}>

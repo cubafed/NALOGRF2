@@ -22,6 +22,16 @@ export function serializeSourceOfFundsPackText(pack: SourceOfFundsPack): string 
   lines.push(`> ${pack.disclaimer}`);
   lines.push("");
 
+  lines.push("## Сводка операций");
+  lines.push(`Всего операций: ${pack.operationsSummary.totalOperations}`);
+  if (pack.operationsSummary.byType.length > 0) {
+    lines.push("");
+    for (const row of pack.operationsSummary.byType) {
+      lines.push(`- ${row.type}: ${row.count}`);
+    }
+  }
+  lines.push("");
+
   lines.push("## Поступления по источникам");
   if (pack.inflowBySource.length === 0) {
     lines.push("Нет поступлений в загруженных данных.");

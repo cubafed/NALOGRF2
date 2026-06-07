@@ -27,6 +27,10 @@ export interface LetterContext {
   p2pCount: number;
   unknownSourceCount: number;
   largeDisposalCount: number;
+  rapidTransitCount: number;
+  concentratedCounterpartyCount: number;
+  /** Russian-labelled document names attached to the package (for the cover letter). */
+  attachedDocuments: string[];
 }
 
 const DRAFT_NOTE =
@@ -93,6 +97,69 @@ export function buildP2pNatureLetter(ctx: LetterContext): ExplanationLetterTempl
       "P2P-операции представляют собой покупку/продажу цифровых активов с физическими " +
         "лицами через площадку [название площадки]. По каждой сделке прилагаю подтверждение " +
         "ордера, реквизиты перевода и сведения о контрагенте в объёме, доступном на площадке.",
+      "",
+      DRAFT_NOTE,
+    ].join("\n"),
+  };
+}
+
+export function buildBankCoverLetter(ctx: LetterContext): ExplanationLetterTemplate {
+  const docs =
+    ctx.attachedDocuments.length > 0
+      ? ctx.attachedDocuments.map((d) => `  - ${d}`).join("\n")
+      : "  - [перечислите прилагаемые документы]";
+
+  return {
+    key: "bank_cover",
+    title: "Сопроводительное заявление в банк",
+    appliesWhen: "Ответ на запрос банка о пояснениях по операциям.",
+    body: [
+      "Кому: [наименование банка]",
+      "От: [ФИО], счёт [номер счёта], [контактные данные]",
+      `Период операций: ${ctx.periodLabel}`,
+      "",
+      "В ответ на ваш запрос направляю пояснения и подтверждающие документы по моим " +
+        "операциям с цифровыми активами. Прошу учесть приложенные материалы при рассмотрении.",
+      `Источники операций: ${sourcesSentence(ctx.sources)}.`,
+      "",
+      "Прилагаю документы:",
+      docs,
+      "",
+      "Готов(а) предоставить дополнительные пояснения и документы по запросу.",
+      "",
+      DRAFT_NOTE,
+    ].join("\n"),
+  };
+}
+
+export function buildRapidTransitLetter(ctx: LetterContext): ExplanationLetterTemplate {
+  return {
+    key: "rapid_transit",
+    title: "Пояснение по быстрому вводу и выводу средств",
+    appliesWhen: `Есть поступления с быстрым последующим выводом (${ctx.rapidTransitCount}).`,
+    body: [
+      "Поясняю характер операций с быстрым вводом и последующим выводом средств за период " +
+        ctx.periodLabel + ".",
+      "Цель операций: [укажите цель — покупка/продажа цифровых активов, перевод между " +
+        "собственными счетами, расчёт с контрагентом]. Средства относятся к моей личной " +
+        "деятельности. Прилагаю банковскую выписку, историю операций и подтверждения сделок.",
+      "",
+      DRAFT_NOTE,
+    ].join("\n"),
+  };
+}
+
+export function buildConcentratedCounterpartyLetter(ctx: LetterContext): ExplanationLetterTemplate {
+  return {
+    key: "concentrated_counterparty",
+    title: "Пояснение по операциям с одним контрагентом",
+    appliesWhen: `Есть концентрация операций с одним контрагентом (${ctx.concentratedCounterpartyCount}).`,
+    body: [
+      "Поясняю характер операций с контрагентом [имя/идентификатор контрагента] за период " +
+        ctx.periodLabel + ".",
+      "Характер отношений: [укажите — регулярная покупка/продажа цифровых активов, расчёты " +
+        "по договору, переводы между собственными счетами]. Прилагаю подтверждения сделок и, " +
+        "при наличии, документы, описывающие отношения с контрагентом.",
       "",
       DRAFT_NOTE,
     ].join("\n"),
