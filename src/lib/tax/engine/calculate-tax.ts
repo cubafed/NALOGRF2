@@ -1,6 +1,6 @@
-import type { Transaction, TransactionType } from "@/lib/domain/types";
+import type { Transaction } from "@/lib/domain/types";
 import { buildAcquisitionLots } from "@/lib/tax/lots/build-lots";
-import { convertToReport } from "@/lib/tax/rates/convert";
+import { buildDisposalInputs } from "@/lib/tax/engine/build-disposals";
 import { fifoMethod } from "@/lib/tax/methods/fifo";
 import type { ManualCostBasisByTransactionId } from "@/lib/tax/manual-cost-basis-types";
 import type {
@@ -9,23 +9,6 @@ import type {
   RateLookup,
   TaxEngineResult,
 } from "@/lib/tax/engine/engine-types";
-
-/** Operation types treated as taxable disposals in the engine. */
-const DISPOSAL_TYPES: ReadonlySet<TransactionType> = new Set<TransactionType>(["sell", "p2p"]);
-
-function parsePositive(value: string | null | undefined): number | null {
-  if (typeof value !== "string" || value.trim().length === 0) return null;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-}
-
-function transactionDate(transaction: Transaction): string | undefined {
-  return transaction.date ?? transaction.timestamp;
-}
-
-function isDisposal(transaction: Transaction): boolean {
-  return DISPOSAL_TYPES.has(transaction.type);
-}
 
 export interface CalculateTaxOptions {
   transactions: readonly Transaction[];
@@ -62,23 +45,7 @@ export function calculateTax({
   const warnings: string[] = [];
 
   const lots = buildAcquisitionLots(transactions, rates, manualCostBasis);
-
-  const disposals = transactions.filter(isDisposal).map((transaction) => {
-    const date = transactionDate(transaction);
-    const quantity = parsePositive(transaction.amount) ?? 0;
-    const proceedsReport = convertToReport(
-      parsePositive(transaction.fiatValue),
-      transaction.fiatCurrency,
-      date,
-      rates,
-    );
-    // Fees are only valued when we can convert them (fiat fee or report currency).
-    // A crypto-denominated fee needs a price (Phase 2) and is treated as 0 here.
-    const feeReport =
-      convertToReport(parsePositive(transaction.feeAmount), transaction.feeAsset, date, rates) ?? 0;
-
-    return { transaction, asset: (transaction.asset ?? "").trim().toUpperCase(), date, quantity, proceedsReport, feeReport };
-  });
+  const disposals = buildDisposalInputs(transactions, rates);
 
   const lines = method.matchDisposals({ lots, disposals });
 
