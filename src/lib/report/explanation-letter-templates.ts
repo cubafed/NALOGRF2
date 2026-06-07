@@ -31,6 +31,13 @@ export interface LetterContext {
   concentratedCounterpartyCount: number;
   /** Russian-labelled document names attached to the package (for the cover letter). */
   attachedDocuments: string[];
+  /**
+   * Optional lines describing assets and realization — e.g. "BTC: 3 сделки продажи".
+   * Used in bank cover and general letter to make the text more concrete.
+   */
+  assetSummaryLines?: string[];
+  /** Number of income-type operations (income, mining reward, staking reward). */
+  incomeCount?: number;
 }
 
 const DRAFT_NOTE =
@@ -109,6 +116,11 @@ export function buildBankCoverLetter(ctx: LetterContext): ExplanationLetterTempl
       ? ctx.attachedDocuments.map((d) => `  - ${d}`).join("\n")
       : "  - [перечислите прилагаемые документы]";
 
+  const assetBlock =
+    ctx.assetSummaryLines && ctx.assetSummaryLines.length > 0
+      ? "\nСводка по активам:\n" + ctx.assetSummaryLines.map((l) => `  - ${l}`).join("\n")
+      : "";
+
   return {
     key: "bank_cover",
     title: "Сопроводительное заявление в банк",
@@ -120,7 +132,7 @@ export function buildBankCoverLetter(ctx: LetterContext): ExplanationLetterTempl
       "",
       "В ответ на ваш запрос направляю пояснения и подтверждающие документы по моим " +
         "операциям с цифровыми активами. Прошу учесть приложенные материалы при рассмотрении.",
-      `Источники операций: ${sourcesSentence(ctx.sources)}.`,
+      `Источники операций: ${sourcesSentence(ctx.sources)}.` + assetBlock,
       "",
       "Прилагаю документы:",
       docs,
@@ -167,15 +179,101 @@ export function buildConcentratedCounterpartyLetter(ctx: LetterContext): Explana
 }
 
 export function buildLargeDisposalLetter(ctx: LetterContext): ExplanationLetterTemplate {
+  const assetBlock =
+    ctx.assetSummaryLines && ctx.assetSummaryLines.length > 0
+      ? "\nОперации реализации:\n" + ctx.assetSummaryLines.map((l) => `  - ${l}`).join("\n")
+      : "";
+
   return {
     key: "large_disposal",
     title: "Пояснение по крупной продаже/выводу",
     appliesWhen: `Есть крупные продажи или выводы в fiat (${ctx.largeDisposalCount}).`,
     body: [
-      "Поясняю крупные операции продажи/вывода средств за период " + ctx.periodLabel + ".",
+      "Поясняю крупные операции продажи/вывода средств за период " + ctx.periodLabel + "." +
+        assetBlock,
       "Активы были ранее приобретены [дата/способ приобретения]; продажа/вывод отражают " +
         "реализацию ранее приобретённых активов. Прилагаю историю приобретения, подтверждение " +
         "сделки продажи и банковскую выписку по зачислению средств.",
+      "",
+      DRAFT_NOTE,
+    ].join("\n"),
+  };
+}
+
+export function buildMiningStakingLetter(ctx: LetterContext): ExplanationLetterTemplate {
+  const count = ctx.incomeCount ?? 0;
+  return {
+    key: "mining_staking_income",
+    title: "Пояснение по доходу от майнинга / стейкинга",
+    appliesWhen: `В истории есть операции типа income/mining/staking${count > 0 ? ` (${count})` : ""}.`,
+    body: [
+      "Поясняю происхождение средств, поступивших в виде вознаграждения за период " +
+        ctx.periodLabel + ".",
+      "Средства получены в качестве дохода от [майнинга / стейкинга / вознаграждения " +
+        "за участие в сети — уточните]. Вид деятельности: [личная / в рамках пула / договор].",
+      "Полученные активы: [перечислите активы]. Актив был [продан / конвертирован / сохранён] " +
+        "после получения. Поступления зафиксированы в истории операций, которую прилагаю.",
+      "",
+      DRAFT_NOTE,
+    ].join("\n"),
+  };
+}
+
+export function buildCryptoIncomeLetter(ctx: LetterContext): ExplanationLetterTemplate {
+  return {
+    key: "crypto_income",
+    title: "Пояснение по заработной плате / оплате в криптовалюте",
+    appliesWhen: "Средства получены в качестве заработной платы или оплаты услуг в криптовалюте.",
+    body: [
+      "Поясняю происхождение средств, поступивших в виде оплаты за период " +
+        ctx.periodLabel + ".",
+      "Источник: заработная плата / оплата услуг по договору [номер/дата договора] с " +
+        "[наименование работодателя / заказчика]. Расчёты производились в цифровых активах " +
+        "согласно условиям договора.",
+      "Полученные активы: [перечислите актив и сумму]. В подтверждение прилагаю: договор, " +
+        "акт или иной документ, подтверждающий основание платежа, и историю транзакций.",
+      "",
+      DRAFT_NOTE,
+    ].join("\n"),
+  };
+}
+
+export function buildGiftInheritanceLetter(ctx: LetterContext): ExplanationLetterTemplate {
+  return {
+    key: "gift_inheritance",
+    title: "Пояснение по подарку / наследованию активов",
+    appliesWhen: "Активы получены в дар или по наследству.",
+    body: [
+      "Поясняю происхождение цифровых активов, полученных в качестве подарка / по " +
+        "наследству за период " + ctx.periodLabel + ".",
+      "Получатель: [ФИО]. Даритель / наследодатель: [ФИО]. Основание: [договор дарения / " +
+        "свидетельство о праве на наследство — укажите реквизиты документа].",
+      "Активы: [перечислите актив и объём]. В подтверждение прилагаю соответствующий " +
+        "правоустанавливающий документ и историю транзакций.",
+      "",
+      DRAFT_NOTE,
+    ].join("\n"),
+  };
+}
+
+export function buildPersonalSavingsLetter(ctx: LetterContext): ExplanationLetterTemplate {
+  const inflow =
+    ctx.inflowLines.length > 0
+      ? ctx.inflowLines.map((line) => `  - ${line}`).join("\n")
+      : "  - [укажите суммы по валютам]";
+
+  return {
+    key: "personal_savings",
+    title: "Пояснение по личным накоплениям",
+    appliesWhen: "Средства являются личными накоплениями / ранее сбережёнными активами.",
+    body: [
+      "Поясняю происхождение средств за период " + ctx.periodLabel + ".",
+      "Средства представляют собой мои личные накопления, сформированные за счёт " +
+        "[укажите: трудовых доходов / продажи имущества / иных законных источников].",
+      "Сводка поступлений по данным истории операций:",
+      inflow,
+      "Подтверждающие документы: [банковские выписки, справки о доходах — уточните]. " +
+        "Прилагаю историю операций с цифровыми активами за указанный период.",
       "",
       DRAFT_NOTE,
     ].join("\n"),

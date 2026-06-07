@@ -5,8 +5,12 @@ import type { DocumentChecklistItem } from "@/lib/report/document-checklist-type
 import {
   buildBankCoverLetter,
   buildConcentratedCounterpartyLetter,
+  buildCryptoIncomeLetter,
+  buildGiftInheritanceLetter,
   buildLargeDisposalLetter,
+  buildMiningStakingLetter,
   buildP2pNatureLetter,
+  buildPersonalSavingsLetter,
   buildRapidTransitLetter,
   buildSourceOfFundsLetter,
   buildWalletOwnershipLetter,
@@ -21,6 +25,12 @@ const INFLOW_TYPES: ReadonlySet<TransactionType> = new Set<TransactionType>([
   "p2p",
   "income",
 ]);
+
+/** Disposal/realization types used for asset summary lines. */
+const DISPOSAL_TYPES: ReadonlySet<TransactionType> = new Set<TransactionType>(["sell", "p2p"]);
+
+/** Transaction types counted as income for mining/staking letter. */
+const INCOME_TYPES: ReadonlySet<TransactionType> = new Set<TransactionType>(["income"]);
 
 /** Risk rules whose findings are relevant to a source-of-funds explanation. */
 const SOURCE_OF_FUNDS_RULE_IDS: ReadonlySet<string> = new Set([
@@ -72,6 +82,19 @@ export interface OperationsSummary {
   periodLabel: string;
 }
 
+/**
+ * One item in the package readiness checklist — tells the user what they have and what
+ * is still missing before submitting the package to a bank or accountant.
+ */
+export interface PackReadinessItem {
+  key: string;
+  label: string;
+  /** True when the item is already present in the generated pack. */
+  present: boolean;
+  /** Optional short note on what the user should do next. */
+  hint?: string;
+}
+
 export interface SourceOfFundsPack {
   generatedAt: string;
   periodLabel: string;
@@ -80,6 +103,10 @@ export interface SourceOfFundsPack {
   itemsThatMayNeedExplanation: SourceOfFundsExplanationItem[];
   documentChecklist: DocumentChecklistItem[];
   letterTemplates: ExplanationLetterTemplate[];
+  /** All letters available (including supplementary ones not tied to specific findings). */
+  supplementaryLetters: ExplanationLetterTemplate[];
+  /** Checklist of what is ready vs still needed for the bank package. */
+  readiness: PackReadinessItem[];
   disclaimer: string;
 }
 
@@ -163,6 +190,107 @@ function buildOperationsSummary(
 }
 
 /**
+ * Build human-readable lines summarising realizations (sells/p2p) per asset.
+ * Monetary totals are kept per-currency; never summed across currencies.
+ */
+function buildAssetSummaryLines(transactions: readonly Transaction[]): string[] {
+  const byAsset = new Map<string, { count: number; currencies: Map<string, number> }>();
+  for (const tx of transactions) {
+    if (!DISPOSAL_TYPES.has(tx.type)) continue;
+    const asset = tx.asset.trim().toUpperCase();
+    const entry = byAsset.get(asset) ?? { count: 0, currencies: new Map() };
+    entry.count += 1;
+    const currency = normalizeCurrency(tx.fiatCurrency);
+    const amount = parseNumeric(tx.fiatValue);
+    if (amount !== null && currency !== "—") {
+      entry.currencies.set(currency, (entry.currencies.get(currency) ?? 0) + amount);
+    }
+    byAsset.set(asset, entry);
+  }
+
+  const lines: string[] = [];
+  for (const [asset, data] of [...byAsset.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+    const moneyParts = [...data.currencies.entries()].map(
+      ([cur, total]) =>
+        new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(total) + " " + cur,
+    );
+    const moneyStr = moneyParts.length > 0 ? " · " + moneyParts.join(", ") : "";
+    lines.push(`${asset}: ${data.count} сделок реализации${moneyStr}`);
+  }
+  return lines;
+}
+
+/**
+ * Build the readiness checklist: what is already in the pack, what still needs action.
+ */
+function buildReadiness(
+  letterTemplates: ExplanationLetterTemplate[],
+  supplementaryLetters: ExplanationLetterTemplate[],
+  documentChecklist: DocumentChecklistItem[],
+  itemsThatMayNeedExplanation: SourceOfFundsExplanationItem[],
+): PackReadinessItem[] {
+  const letterKeys = new Set([
+    ...letterTemplates.map((t) => t.key),
+    ...supplementaryLetters.map((t) => t.key),
+  ]);
+  const items: PackReadinessItem[] = [];
+
+  items.push({
+    key: "general_letter",
+    label: "Пояснение об источнике средств (общее)",
+    present: letterKeys.has("source_of_funds_general"),
+    hint: "Всегда включается в пакет.",
+  });
+
+  items.push({
+    key: "bank_cover",
+    label: "Сопроводительное заявление в банк",
+    present: letterKeys.has("bank_cover"),
+    hint: letterKeys.has("bank_cover")
+      ? undefined
+      : "Появится автоматически, когда есть операции, требующие пояснения.",
+  });
+
+  items.push({
+    key: "documents",
+    label: `Документы для пакета (${documentChecklist.length})`,
+    present: documentChecklist.length > 0,
+    hint:
+      documentChecklist.length > 0
+        ? "Собраны по найденным признакам. Проверьте и приложите оригиналы."
+        : "Дополнительные документы по текущим данным не требуются.",
+  });
+
+  if (itemsThatMayNeedExplanation.length > 0) {
+    items.push({
+      key: "explanation_items",
+      label: `Пунктов, которые могут потребовать пояснения: ${itemsThatMayNeedExplanation.length}`,
+      present: true,
+      hint: "Для каждого подготовлено черновое письмо.",
+    });
+  }
+
+  const supplementaryNeeded: { key: string; label: string }[] = [
+    { key: "mining_staking_income", label: "Письмо по майнингу/стейкингу" },
+    { key: "crypto_income", label: "Письмо по зарплате/оплате в крипте" },
+    { key: "gift_inheritance", label: "Письмо по подарку/наследованию" },
+    { key: "personal_savings", label: "Письмо по личным накоплениям" },
+  ];
+  for (const s of supplementaryNeeded) {
+    if (!letterKeys.has(s.key)) {
+      items.push({
+        key: s.key,
+        label: s.label,
+        present: false,
+        hint: "Доступно в разделе «Дополнительные письма».",
+      });
+    }
+  }
+
+  return items;
+}
+
+/**
  * Build a deterministic source-of-funds package from transactions and existing risk
  * findings. Reuses the document checklist and the deterministic risk findings — it does
  * not re-run any classification or invent figures. Pure and reproducible (timestamp is
@@ -198,6 +326,8 @@ export function buildSourceOfFundsPack(
 
   const inflowBySource = buildInflowBySource(transactions);
   const periodLabel = derivePeriodLabel(transactions);
+  const assetSummaryLines = buildAssetSummaryLines(transactions);
+  const incomeCount = transactions.filter((tx) => INCOME_TYPES.has(tx.type)).length;
 
   const hasRule = (ruleId: string) => relevantFindings.some((f) => f.ruleId === ruleId);
   const countForRule = (ruleId: string) =>
@@ -222,6 +352,8 @@ export function buildSourceOfFundsPack(
     rapidTransitCount: countForRule("rapid_transit"),
     concentratedCounterpartyCount: countForRule("concentrated_counterparty"),
     attachedDocuments: documentChecklist.map((doc) => doc.ru),
+    assetSummaryLines,
+    incomeCount,
   };
 
   const letterTemplates: ExplanationLetterTemplate[] = [buildSourceOfFundsLetter(context)];
@@ -235,6 +367,21 @@ export function buildSourceOfFundsPack(
     letterTemplates.push(buildConcentratedCounterpartyLetter(context));
   if (hasRule("large_fiat_withdrawal")) letterTemplates.push(buildLargeDisposalLetter(context));
 
+  // Supplementary letters: always available for user to use regardless of findings.
+  const supplementaryLetters: ExplanationLetterTemplate[] = [
+    buildMiningStakingLetter(context),
+    buildCryptoIncomeLetter(context),
+    buildGiftInheritanceLetter(context),
+    buildPersonalSavingsLetter(context),
+  ];
+
+  const readiness = buildReadiness(
+    letterTemplates,
+    supplementaryLetters,
+    documentChecklist,
+    itemsThatMayNeedExplanation,
+  );
+
   return {
     generatedAt: options.generatedAt ?? new Date().toISOString(),
     periodLabel,
@@ -243,6 +390,8 @@ export function buildSourceOfFundsPack(
     itemsThatMayNeedExplanation,
     documentChecklist,
     letterTemplates,
+    supplementaryLetters,
+    readiness,
     disclaimer: SOURCE_OF_FUNDS_DISCLAIMER,
   };
 }
