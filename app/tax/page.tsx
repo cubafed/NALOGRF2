@@ -1,5 +1,6 @@
 import { FooterDisclaimer } from "@/components/layout/FooterDisclaimer";
 import { Header } from "@/components/layout/Header";
+import { TaxEnginePanel } from "@/components/tax/TaxEnginePanel";
 import { ManualCostBasisPanel } from "@/components/tax/ManualCostBasisPanel";
 import { AssistantPanel } from "@/components/assistant/AssistantPanel";
 
@@ -26,7 +27,10 @@ export default function TaxPage() {
                 предварительный результат для проверки бухгалтером или налоговым консультантом.
               </p>
             </div>
-            <ManualCostBasisPanel />
+            <TaxEnginePanel />
+            <div style={{ marginTop: 24 }}>
+              <ManualCostBasisPanel />
+            </div>
             <div style={{ marginTop: 24 }}>
               <AssistantPanel />
             </div>
